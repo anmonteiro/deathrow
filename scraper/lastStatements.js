@@ -14,7 +14,7 @@ var options = {
 function retrieveLastStatement( url, callback ) {
   var scraper;
 
-  options.url = 'http://www.tdcj.state.tx.us/death_row/' + url;
+  options.url = url;
   scraper = mns( options );
 
   scraper.execute(function( err, items ) {
@@ -22,7 +22,6 @@ function retrieveLastStatement( url, callback ) {
       return callback( err );
     }
 
-    //console.log( items );
     return callback(null, items[0].lastStmt);
   });
 };

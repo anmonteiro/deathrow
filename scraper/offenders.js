@@ -29,6 +29,15 @@ function offendersToJsonFile() {
   scraper.execute(function( err, items ) {
     var pathToSave = __dirname + '/files/offenders.json';
 
+    items.map(function( el ) {
+      el.executionNo = + el.executionNo;
+      el._id = + el._id;
+      el.age = + el.age;
+      el.lastStmtUrl = 'http://www.tdcj.state.tx.us/death_row/' + el.lastStmtUrl;
+      el.profileUrl = 'http://www.tdcj.state.tx.us/death_row/' + el.profileUrl;
+      return el;
+    });
+
     console.log( 'Saving to ' + pathToSave );
     
     fs.writeFileSync( pathToSave, JSON.stringify( items, null, 2) );

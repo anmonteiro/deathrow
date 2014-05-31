@@ -20,14 +20,14 @@ var options = {
     age : 'td:nth-child(7)',
     dateExecuted : 'td:nth-child(8)',
     race : 'td:nth-child(9)',
-    tdcjId : 'td:nth-child(6)'
+    _id : 'td:nth-child(6)'
   },
 };
 var scraper = mns(options);
 
 function offendersToJsonFile() {
   scraper.execute(function( err, items ) {
-    var pathToSave = __dirname + '/offenders.json';
+    var pathToSave = __dirname + '/files/offenders.json';
 
     console.log( 'Saving to ' + pathToSave );
     

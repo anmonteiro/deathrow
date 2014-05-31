@@ -53,28 +53,38 @@ function retrieveAllStatements() {
     var db = mongoClient.db( 'deathrow' );
     var offenders = db.collection( 'offenders' );
 
-    offenders.findOne({}, function( err, doc ) {
+    offenders.find({}, function( err, docs ) {
       if( err ) {
         return console.log('No document found');
       }
 
-      retrieveLastStatement( doc.lastStmtUrl, function( err, statement ) {
-        saveLastStmt( offenders, doc._id, statement, function( err ) {
-          if( err ) {
-            return 0;
-          }
-          console.log( 'successfully updated' );
+      // go through every record in the database
+      docs.each(function( err, doc ) {
+        if(doc === null) {
           return mongoClient.close();
-        });
+        }
+        // for each offender, do:
+        // 1. extract "lastStmtUrl", save _id for later
+        // 2. scrape that website for the offender's last statement
+        setTimeout(function() {
+          retrieveLastStatement( doc.lastStmtUrl, function( err, statement ) {
+          // 3. save the statement to DB
+          saveLastStmt( offenders, doc._id, statement, function( err ) {
+            if( err ) {
+              return -1;
+            }
+            console.log( 'successfully updated' );
+            return;
+          });
+        })}, 500);
       });
     });
   });
 };
 retrieveAllStatements();
 
-// go through every record in the database
-// for each offender, do:
-// 1. extract "lastStmtUrl", save _id for later
-// 2. scrape that website for the offender's last statement
-// 3. save the statement to DB
+
+
+
+
 

@@ -1,4 +1,4 @@
-var mns = require( 'mns' );
+var mns = require( __dirname + '/custom_mns/mns' );
 var MongoClient = require( 'mongodb' ).MongoClient;
 var Server = require( 'mongodb' ).Server;
 
@@ -7,7 +7,7 @@ var options = {
   type : 'text/html',
   listSelector : '#body',
   articleSelector : {
-    lastStmt : 'p:nth-child(11)'
+    lastStmt : 'p:nth-last-child(-n+3)'
   },
 };
 
@@ -47,11 +47,30 @@ function saveLastStmt( offenders, id, lastStmtContent, callback ) {
 
 function retrieveAllStatements() {
   var mongo = new MongoClient( new Server( 'localhost', 27017 ) );
-  
+  var done = 0;
+
   // establish connection to the DB
   mongo.open(function( err, mongoClient ) {
     var db = mongoClient.db( 'deathrow' );
     var offenders = db.collection( 'offenders' );
+    var total;
+
+    offenders.count(function(err, count) {
+      if( err ) {
+        console.log( err );
+        total = -1;
+        return total;
+      }
+      total = count;
+
+
+      var interval = setInterval(function() {
+        if( done ===  total) {
+          mongoClient.close();
+          clearInterval(interval);
+        }
+       }, 1000);
+    });
 
     offenders.find({}, function( err, docs ) {
       if( err ) {
@@ -61,22 +80,23 @@ function retrieveAllStatements() {
       // go through every record in the database
       docs.each(function( err, doc ) {
         if(doc === null) {
-          return mongoClient.close();
+          return;
         }
         // for each offender, do:
         // 1. extract "lastStmtUrl", save _id for later
         // 2. scrape that website for the offender's last statement
-        setTimeout(function() {
-          retrieveLastStatement( doc.lastStmtUrl, function( err, statement ) {
+        retrieveLastStatement( doc.lastStmtUrl, function( err, statement ) {
           // 3. save the statement to DB
           saveLastStmt( offenders, doc._id, statement, function( err ) {
             if( err ) {
-              return -1;
+              return err;
             }
             console.log( 'successfully updated' );
-            return;
+            done++;
+            console.log( 'done: ' + done );
+            return done;
           });
-        })}, 500);
+        });
       });
     });
   });

@@ -10,9 +10,12 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "1.9.x",
-    "mocha": "1.18.x"
+    "mocha": "1.18.x",
+    "mongodb": "^1.4.5",
+    "cheerio": "^0.16.0",
+    "mns": "^0.1.1",
+    "request": "^2.36.0"
   },
   "dependencies": {
-    "mongodb": "^1.4.5"
   }
 }

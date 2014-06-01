@@ -1,2 +1,0 @@
-Death Row Last Statements
-==

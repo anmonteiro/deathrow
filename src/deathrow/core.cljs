@@ -20,6 +20,7 @@
     :lastStmt " Aguilar, Jesus Ledesma\n Last Statement:\n Yes sir.  I would like to say to my family, I am alright. (Spanish) Where are you Leo; are you there Leo? (Spanish) Don&apos;t lie man.  Be happy.  Are you happy?  Are you all happy? (Spanish)  "
   })
 
+
 (defpartial lastQuote
 	[offender]
 	[:blockquote
@@ -27,13 +28,15 @@
 		[:footer
 			[:cite {:title (str (.-firstName offender) " " (.-lastName offender))}
 				[:a {:href (.-profileUrl offender)} (str (.-firstName offender) " " (.-lastName offender))]]
-				", executed 05/24/2006"]])
+				(str ", executed " (.-dateExecuted offender))]])
+
 
 (defn render-quote
 	[offender]
 	(-> ($ js/document)
 		(jayq/find ".col-md-8.well")
 		(.append (lastQuote offender))))
+
 
 (defn fetch-random-offender
 	[]
@@ -42,9 +45,9 @@
 	                 :success  (fn [data] (render-quote data))}))
 
 
-
 (defn init
 	[]
 	(jayq/document-ready fetch-random-offender))
 
 (init)
+

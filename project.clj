@@ -5,7 +5,8 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2173"]
                  [crate "0.2.4"]
-                 [jayq "2.5.1"]]
+                 [jayq "2.5.1"]
+                 [com.cemerick/clojurescript.test "0.3.1"]]
 
   :plugins [[lein-cljsbuild "1.0.2"]]
   :source-paths ["src"

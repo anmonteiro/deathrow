@@ -5,10 +5,10 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2173"]
                  [crate "0.2.4"]
-                 [jayq "2.5.1"]
-                 [com.cemerick/clojurescript.test "0.3.1"]]
+                 [jayq "2.5.1"]]
 
-  :plugins [[lein-cljsbuild "1.0.2"]]
+  :plugins [[lein-cljsbuild "1.0.2"]
+            [com.cemerick/clojurescript.test "0.3.1"]]
   :source-paths ["src"
   "comp/clojurescript/src/clj"
               "comp/clojurescript/src/cljs"]
@@ -20,4 +20,10 @@
                 :output-dir "out"
                 :optimizations :none
                 ;:libs ["public/js/jquery-2.1.1.min.js"]
-                :source-map true}}]})
+                :source-map true}}
+                {:id "deathrow"
+                :source-paths ["src" "test"]
+                :compiler {
+                :output-to "target/test/deathrow.test.js"
+                :output-dir "target/test"
+                :optimizations :none}}]})

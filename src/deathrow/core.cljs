@@ -8,7 +8,7 @@
 (enable-console-print!)
 
 
-(defpartial lastQuote
+(defpartial last-quote
 	[offender]
 	[:blockquote
 		[:p (crate/raw (.-lastStmt offender))]
@@ -18,18 +18,32 @@
 				(str ", executed " (.-dateExecuted offender))]])
 
 
+(defpartial error-quote
+	[]
+	[:h2 "There was an error loading your request. "
+		[:small "Try again!"]])
+
+
 (defn render-quote
 	[offender]
 	(-> ($ ".quote")
 		(.empty)
-		(.append (lastQuote offender))))
+		(.append (last-quote offender))))
+
+(defn render-quote-error
+	[]
+	(-> ($ ".quote")
+ 		.empty
+ 		(.append error-quote)
+ 		))
 
 
 (defn fetch-random-offender
 	[]
 	(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
 	                {:dataType "json"
-	                 :success  (fn [data] (render-quote data))}))
+	                 :success  (fn [data] (render-quote data))
+	                 :error render-quote-error}))
 
 
 (defn init-random-btn-event

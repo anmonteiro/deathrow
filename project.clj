@@ -21,9 +21,12 @@
                 :optimizations :none
                 ;:libs ["public/js/jquery-2.1.1.min.js"]
                 :source-map true}}
-                {:id "deathrow"
-                :source-paths ["src" "test"]
+                {:id "test"
+                :source-paths ["test"]
                 :compiler {
                 :output-to "target/test/deathrow.test.js"
                 :output-dir "target/test"
-                :optimizations :none}}]})
+                :optimizations :simple}}]
+    :test-commands {"unit-tests" ["node" :node-runner
+                                  "public/js/jquery-2.1.1.min.js"
+                                  "target/test/deathrow.test.js"]}})

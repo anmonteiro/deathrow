@@ -1,7 +1,8 @@
 (ns deathrow.test
     (:require-macros [cemerick.cljs.test
                     :refer (is deftest with-test run-tests testing test-var)])
-    (:require [cemerick.cljs.test :as t]))
+    (:require [cemerick.cljs.test :as t]
+                [deathrow.core :as deathrow]))
 
 (def test-offender
 	{
@@ -18,4 +19,4 @@
   })
 
 (deftest test-render-quote
-    (is (not (nil? (re-find (render-quote test-offender) (str (:firstName test-offender) " " (:lastName test-offender)))))))
+    (is (not (nil? (re-find (deathrow/render-quote test-offender) (str (:firstName test-offender) " " (:lastName test-offender)))))))

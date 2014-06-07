@@ -11,11 +11,11 @@
 (defpartial last-quote
 	[offender]
 	[:blockquote
-		[:p (crate/raw (.-lastStmt offender))]
+		[:p (crate/raw (:lastStmt offender))]
 		[:footer
-			[:cite {:title (str (.-firstName offender) " " (.-lastName offender))}
-				[:a {:href (.-profileUrl offender)} (str (.-firstName offender) " " (.-lastName offender))]]
-				(str ", executed " (.-dateExecuted offender))]])
+			[:cite {:title (str (:firstName offender) " " (:lastName offender))}
+				[:a {:href (:profileUrl offender)} (str (:firstName offender) " " (:lastName offender))]]
+				(str ", executed " (:dateExecuted offender))]])
 
 
 (defpartial error-quote
@@ -42,7 +42,7 @@
 	[]
 	(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
 	                {:dataType "json"
-	                 :success  (fn [data] (render-quote data))
+	                 :success  (fn [data] (render-quote (js->clj data :keywordize-keys true)))
 	                 :error render-quote-error}))
 
 

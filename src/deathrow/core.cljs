@@ -3,10 +3,32 @@
 	(:require
 		[jayq.core :as jayq :refer [$]]
 		[jayq.util :refer [log]]
-		[crate.core :as crate]))
+		[crate.core :as crate]
+		[secretary.core :as secretary :include-macros true :refer [defroute]]
+		[goog.events :as events]
+		[goog.history.EventType :as EventType])
+	(:import goog.History))
 
-(enable-console-print!)
+(def hist (History.))
 
+(defroute offenders-path "/"
+	[]
+	(jayq/document-ready
+		(do (secretary/dispatch! (random-path))
+			(init-random-btn-event))))
+;; (.setToken hist "/offenders/random")
+(defroute offenders-path "/offenders"
+	[]
+	(log (offenders-path)))
+
+(defroute random-path (str (offenders-path) "/random")
+	[]
+	(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
+	            {:dataType "json"
+	             :success  (fn [data] (render-quote (js->clj data :keywordize-keys true)))
+	             :error render-error-quote})
+	;(.setToken hist (random-path))
+	)
 
 (defpartial last-quote
 	[offender]
@@ -30,33 +52,29 @@
 		(.empty)
 		(.append (last-quote offender))))
 
-(defn render-quote-error
+(defn render-error-quote
 	[]
 	(-> ($ ".quote")
  		.empty
- 		(.append error-quote)
- 		))
-
-
-(defn fetch-random-offender
-	[]
-	(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
-	                {:dataType "json"
-	                 :success  (fn [data] (render-quote (js->clj data :keywordize-keys true)))
-	                 :error render-quote-error}))
-
+ 		(.append error-quote)))
 
 (defn init-random-btn-event
 	[]
 	(-> ($ ".load-statement")
-		(.on "click" fetch-random-offender)))
+		(.on "click" #(do (secretary/dispatch! (random-path)) (.preventDefault %)))))
 
 
 (defn init
 	[]
 	(do
-		(jayq/document-ready fetch-random-offender)
-		(init-random-btn-event)))
+		(log "Initializing...")
+		(doto hist
+			(goog.events/listen EventType/NAVIGATE #(do (log "NAVIGATE event")
+														(log %)
+														(secretary/dispatch! (.-token %))
+														;(.setToken hist (.-token %))
+														(log "oi")))
+			(.setEnabled true))))
 
 (init)
 

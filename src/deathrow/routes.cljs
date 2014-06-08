@@ -22,7 +22,7 @@
 	[]
 	(-> ($ ".load-statement, .page-header a")
 		(.on "click"
-			#(do (log %)
+			#(do ;(log %)
 				(.preventDefault %)
 				(h/dispatch! (.-pathname (.-target %)))
 				;(log (.getToken hist))
@@ -37,7 +37,8 @@
 	[]
 	(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
 	            {:dataType "json"
-	             :success  (fn [data] (render-quote (js->clj data :keywordize-keys true)))
+	             :success  (fn [data status xhr]
+	             				(render-quote (js->clj data :keywordize-keys true)))
 	             :error render-error-quote
 	             :timeout 5000}))
 
@@ -50,8 +51,8 @@
 	)
 
 (h/navigate-callback
-	#(do (log "NAVIGATE event")
-		(log (str "TOKEN: " (.-token %)))
+	#(do ;(log "NAVIGATE event")
+		;(log (str "TOKEN: " (.-token %)))
 		;(.preventDefault %)
 		;(.setToken hist (.-token %))
 		(secretary/dispatch! (.-token %))))

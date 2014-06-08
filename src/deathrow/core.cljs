@@ -6,10 +6,12 @@
 		[crate.core :as crate]
 		[secretary.core :as secretary :include-macros true :refer [defroute]]
 		[goog.events :as events]
-		[goog.history.EventType :as EventType])
-	(:import goog.History))
-
-(def hist (History.))
+		[goog.history.EventType :as EventType]
+		[goog.history.Html5History :as history5])
+	
+	)
+;(:import goog.History.Html5History)
+(def hist (goog.history.Html5History.))
 
 (defroute offenders-path "/"
 	[]
@@ -61,20 +63,28 @@
 (defn init-random-btn-event
 	[]
 	(-> ($ ".load-statement")
-		(.on "click" #(do (secretary/dispatch! (random-path)) (.preventDefault %)))))
+		;(.on "click" #(do (secretary/dispatch! (random-path)) (.preventDefault %)))
+		))
 
+(defn init-history
+	[]
+	(doto hist
+		(goog.events/listen EventType/NAVIGATE #(do (log "NAVIGATE event")
+													(log %)
+													(log (str "TOKEN: " (.-token %)))
+													(.stopPropagation %)
+													(secretary/dispatch! (.-token %))
+													;(.setToken hist (.-token %))
+													(log "oi"))))
+		(.setUseFragment false)
+		(.setPathPrefix "")
+		(.setEnabled true))
 
 (defn init
 	[]
 	(do
 		(log "Initializing...")
-		(doto hist
-			(goog.events/listen EventType/NAVIGATE #(do (log "NAVIGATE event")
-														(log %)
-														(secretary/dispatch! (.-token %))
-														;(.setToken hist (.-token %))
-														(log "oi")))
-			(.setEnabled true))))
+		))
 
-(init)
+(init-history)
 

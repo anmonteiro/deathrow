@@ -8,6 +8,7 @@
 		[goog.history.Html5History :as Html5History]))
 
 (declare history)
+(def prev (atom "/"))
 
 (defn init-history
 	[]
@@ -16,20 +17,22 @@
 					(goog.History.))]
 		(doto hist
 			(.setUseFragment false)
-			(.setPathPrefix "")
-			(.setEnabled true))
+			(.setPathPrefix ""))
 		hist))
 
 (defn navigate-callback
   ([callback-fn]
    (navigate-callback history callback-fn))
   ([hist callback-fn]
-   (events/listen history EventType/NAVIGATE
-                  (fn [e]
-                    (callback-fn {:token (keyword (.-token e))
-                                  :type (.-type e)
-                                  :navigation? (.-isNavigation e)})))))
+   (doto history
+       (events/listen EventType/NAVIGATE
+			(fn [e]
+			(callback-fn e)))
+       (.setEnabled true))))
 
+;{:token (keyword (.-token e))
+;:type (.-type e)
+;:navigation? (.-isNavigation e)}
 
 (defn get-token
   []
@@ -43,7 +46,9 @@
 
 (defn dispatch!
 	[url]
-	(.dispatchEvent history (goog.history.Event. url false))
-	(.setToken history url))
+	(.setToken history url)
+	(if (= url @prev)
+		(.dispatchEvent history (goog.history.Event. url false))
+		(reset! prev url)))
 
 (def history (init-history))

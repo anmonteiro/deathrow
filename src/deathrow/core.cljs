@@ -6,8 +6,7 @@
 
 (defn init
 	[]
-	(do
-		(log "Initializing...")))
+	(routes/init-random-btn-event))
 
 
 (init)

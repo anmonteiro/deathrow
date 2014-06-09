@@ -6,7 +6,8 @@
                  [org.clojure/clojurescript "0.0-2173"]
                  [crate "0.2.4"]
                  [jayq "2.5.1"]
-                 [secretary "1.1.1"]]
+                 [secretary "1.1.1"]
+                 [waltz "0.1.0-alpha1"]]
 
   :plugins [[lein-cljsbuild "1.0.2"]
             [com.cemerick/clojurescript.test "0.3.1"]]

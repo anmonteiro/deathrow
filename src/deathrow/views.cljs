@@ -12,7 +12,17 @@
 				(str ", executed " (:dateExecuted offender))]])
 
 
-(defpartial error-quote
-	[]
+(defpartial error-quote []
 	[:h2 "There was an error loading your request. "
 		[:small "Try again!"]])
+
+(defpartial spinner []
+    [:div#circularG.center-block.spinner.fade
+        [:div#circularG_1.circularG]
+        [:div#circularG_2.circularG]
+        [:div#circularG_3.circularG]
+        [:div#circularG_4.circularG]
+        [:div#circularG_5.circularG]
+        [:div#circularG_6.circularG]
+        [:div#circularG_7.circularG]
+        [:div#circularG_8.circularG]])

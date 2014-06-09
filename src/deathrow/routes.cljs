@@ -5,7 +5,8 @@
 		[deathrow.history :as h]
 		[deathrow.views :as v]
 		[secretary.core :as secretary :include-macros true :refer [defroute]]
-		[waltz.state :as state]))
+		;[waltz.state :as state]
+		))
 
 ;; No need for this just yet
 ;; (:use-macros [waltz.macros :only [in out defstate defevent]])

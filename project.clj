@@ -7,7 +7,8 @@
                  [crate "0.2.4"]
                  [jayq "2.5.1"]
                  [secretary "1.1.1"]
-                 [waltz "0.1.0-alpha1"]]
+                 ;[waltz "0.1.0-alpha1"]
+                 ]
 
   :plugins [[lein-cljsbuild "1.0.2"]
             [com.cemerick/clojurescript.test "0.3.1"]]
@@ -25,7 +26,7 @@
                  :source-paths ["src"]
                  :compiler {
                   :output-to "public/js/deathrow.js"
-                  :externs ["target/externs/jquery-1.9.1.extern.js"]
+                  :externs ["externs/jquery-1.9.1.extern.js"]
                   :optimizations :advanced
                   :pretty-print false
                 }}

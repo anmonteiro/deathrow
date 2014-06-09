@@ -44,17 +44,20 @@
 				;(secretary/dispatch! (.-pathname (.-target %)))
 				;(.setToken hist (.-pathname (.-target %)))
 				))))
-				
+
+
 (declare random-path)
 (declare offenders-path)
+
 (defroute root-path "/"
 	[]
-	(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
-	            {:dataType "json"
-	             :success  (fn [data status xhr]
-	             				(render-quote (js->clj data :keywordize-keys true)))
-	             :error render-error-quote
-	             :timeout 10000}))
+	(let [ajax-timeout (atom 0)]
+		(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
+			{:dataType "json"
+			:beforeSend #(reset! ajax-timeout (js/setTimeout render-spinner 1000))
+			:success #(do (js/clearTimeout @ajax-timeout) (render-quote (js->clj %1 :keywordize-keys true)))
+			:error render-error-quote
+			:timeout 10000})))
 
 (defroute offenders-path "/offenders"
 	[]

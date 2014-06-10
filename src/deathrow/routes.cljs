@@ -18,14 +18,10 @@
 (secretary/set-config! :prefix "/deathrow")
 
 (defn render
-	([$elem view]
+	[$elem view]
 	(-> $elem
 		.empty
 		(.append view)))
-	([$elem view obj]
-	(-> $elem
-		.empty
-		(.append (view obj)))))
 
 
 (defn init-random-btn-event

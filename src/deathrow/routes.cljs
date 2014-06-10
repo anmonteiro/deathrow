@@ -1,5 +1,5 @@
 (ns deathrow.routes
-	(:require-macros [deathrow.macros :as macros])
+	(:use-macros [deathrow.macros :only [render-quote-container]])
 	(:require
 		[jayq.core :as jayq :refer [$]]
 		[deathrow.util :refer [log]]
@@ -44,15 +44,15 @@
 
 (declare random-path)
 (declare offenders-path)
-(log (secretary/get-config :prefix))
+
 (defroute root-path (str (secretary/get-config :prefix) "/")
 	[]
 	(let [ajax-timeout (atom 0)]
 		(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
 			{:dataType "json"
-			:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (macros/render-quote-container v/spinner)) 1000))
-			:success #(do (js/clearTimeout @ajax-timeout) (macros/render-quote-container (v/last-quote (js->clj %1 :keywordize-keys true))))
-			:error #(macros/render-quote-container error-quote)
+			:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render-quote-container v/spinner)) 1000))
+			:success #(do (js/clearTimeout @ajax-timeout) (render-quote-container (v/last-quote (js->clj %1 :keywordize-keys true))))
+			:error #(do (js/clearTimeout @ajax-timeout) (render-quote-container v/error-quote))
 			:timeout 10000})))
 
 (defroute offenders-path "/offenders"
@@ -64,8 +64,8 @@
 	)
 
 (h/navigate-callback
-	#(do (log "NAVIGATE event")
-		(log (str "TOKEN: " (.-token %)))
+	#(do ;(log "NAVIGATE event")
+		;(log (str "TOKEN: " (.-token %)))
 		;(.preventDefault %)
 		;(.setToken hist (.-token %))
 		(secretary/dispatch! (.-token %))))

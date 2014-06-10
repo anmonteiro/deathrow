@@ -22,19 +22,18 @@
 		.empty
 		(.append view)))
 
-
-(defn init-random-btn-event
+(defn block-internal-urls
 	[]
-	(-> ($ ".load-statement, .page-header a")
-		(.on "click"
-			#(do ;(log %)
-				(.preventDefault %)
-				(h/dispatch! (.-pathname (.-target %)))
-				;(log (.getToken hist))
-				;(.setToken hist (.-pathname (.-target %)))
-				;(secretary/dispatch! (.-pathname (.-target %)))
-				;(.setToken hist (.-pathname (.-target %)))
-				))))
+	(let
+		[$urls ($ "a")
+		host (-> js/window
+				.-location
+				.-hostname)]
+		(.on $urls "click"
+			(fn [e]
+				(when (= (.-hostname (.-target e)) host)
+					(do (.preventDefault e)
+						(h/dispatch! (.-pathname (.-target e)))))))))
 
 
 (declare random-path)

@@ -6,7 +6,7 @@
 
 (defn init
 	[]
-	(routes/init-random-btn-event))
+	(routes/block-internal-urls))
 
 
 (init)

@@ -15,6 +15,7 @@
 
 (def quote-container ($ :.quote))
 
+(secretary/set-config! :prefix "/deathrow")
 
 (defn render
 	([$elem view]
@@ -43,8 +44,8 @@
 
 (declare random-path)
 (declare offenders-path)
-
-(defroute root-path "/"
+(log (secretary/get-config :prefix))
+(defroute root-path (str (secretary/get-config :prefix) "/")
 	[]
 	(let [ajax-timeout (atom 0)]
 		(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
@@ -58,13 +59,13 @@
 	[]
 	(log (offenders-path)))
 
-(defroute random-path (str (offenders-path) "/random")
+(defroute random-path "/offenders/random"
 	[]
 	)
 
 (h/navigate-callback
-	#(do ;(log "NAVIGATE event")
-		;(log (str "TOKEN: " (.-token %)))
+	#(do (log "NAVIGATE event")
+		(log (str "TOKEN: " (.-token %)))
 		;(.preventDefault %)
 		;(.setToken hist (.-token %))
 		(secretary/dispatch! (.-token %))))

@@ -1,4 +1,5 @@
 (ns deathrow.routes
+	(:require-macros [deathrow.macros :as macros])
 	(:require
 		[jayq.core :as jayq :refer [$]]
 		[deathrow.util :refer [log]]
@@ -14,24 +15,17 @@
 
 (def quote-container ($ :.quote))
 
-(defn render-spinner
-	[]
-	(-> quote-container
+
+(defn render
+	([$elem view]
+	(-> $elem
 		.empty
-		(.append v/spinner)))
-
-
-(defn render-quote
-	[offender]
-	(-> quote-container
+		(.append view)))
+	([$elem view obj]
+	(-> $elem
 		.empty
-		(.append (v/last-quote offender))))
+		(.append (view obj)))))
 
-(defn render-error-quote
-	[]
-	(-> quote-container
- 		.empty
- 		(.append v/error-quote)))
 
 (defn init-random-btn-event
 	[]
@@ -55,9 +49,9 @@
 	(let [ajax-timeout (atom 0)]
 		(jayq/ajax "http://deathrow.herokuapp.com/offenders/random"
 			{:dataType "json"
-			:beforeSend #(reset! ajax-timeout (js/setTimeout render-spinner 1000))
-			:success #(do (js/clearTimeout @ajax-timeout) (render-quote (js->clj %1 :keywordize-keys true)))
-			:error render-error-quote
+			:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (macros/render-quote-container v/spinner)) 1000))
+			:success #(do (js/clearTimeout @ajax-timeout) (macros/render-quote-container (v/last-quote (js->clj %1 :keywordize-keys true))))
+			:error #(macros/render-quote-container error-quote)
 			:timeout 10000})))
 
 (defroute offenders-path "/offenders"

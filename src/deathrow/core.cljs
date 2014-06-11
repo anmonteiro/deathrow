@@ -2,7 +2,7 @@
 	(:require
 		[deathrow.util :refer [log]]
 		[deathrow.routes :as routes]
-		[deathrow.views.core :as view]))
+		[deathrow.models.core :as view]))
 
 
 (defn init

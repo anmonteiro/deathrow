@@ -3,11 +3,7 @@
 		[jayq.core :as jayq :refer [$ ajax]]
 		[deathrow.util :refer [log]]
 		[deathrow.history :as h :refer [navigate-callback]]
-		[deathrow.constants :as C]
-		[deathrow.templates.main :as m :refer [spinner]]
-		[deathrow.templates.offenders.random :as t :refer [last-quote error-quote quote-wrapper]]
-		[deathrow.views.core :as v :refer [render]]
-		[deathrow.views.offenders.random :as views]
+		[deathrow.models.offenders :as offenders]
 		[secretary.core :as secretary :include-macros true :refer [defroute]]))
 
 (declare random-path)
@@ -17,19 +13,20 @@
 	[]
 	(secretary/dispatch! (random-path)))
 
-(defroute offenders-path "/offenders"
+(comment (defroute offenders-path "/offenders"
 	[]
-	(log (offenders-path)))
+	(secretary/dispatch! (random-path)))
+)
 
+(defroute offenders-path-page #"/offenders(/page/(\d+))?"
+	[group id]
+	(.log js/console group)
+	(.log js/console id)
+	)
+;(offenders/get-offenders (offenders-path))
 (defroute random-path "/offenders/random"
 	[]
-	(let [ajax-timeout (atom 0)]
-		(ajax (str C/AJAX-HOSTNAME (random-path))
-			{:dataType "json"
-			:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render views/quote-container spinner)) 1000))
-			:success #(do (js/clearTimeout @ajax-timeout) (render views/quote-container (last-quote (js->clj %1 :keywordize-keys true))))
-			:error #(do (js/clearTimeout @ajax-timeout) (render views/quote-container (error-quote)))
-			:timeout 10000})))
+	(offenders/get-random-offender (random-path)))
 
 (navigate-callback
 	#(do (log "NAVIGATE event")

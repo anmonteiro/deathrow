@@ -23,29 +23,29 @@
     :lastStmt " Aguilar, Jesus Ledesma\n Last Statement:\n Yes sir.  I would like to say to my family, I am alright. (Spanish) Where are you Leo; are you there Leo? (Spanish) Don&apos;t lie man.  Be happy.  Are you happy?  Are you all happy? (Spanish)  "
   })
 
-(defn render-in-quote
+(defn render-content
     [view]
     (render content-container view))
 
 (defn render-offenders-table
     [offenders]
-    (render-in-quote (offenders-table offenders)))
+    )
 
 (defn get-random-offender
     [path]
     (let [ajax-timeout (atom 0)]
         (get-ajax path
-            {:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render-in-quote (spinner))) 1000))
-            :success #(do (js/clearTimeout @ajax-timeout) (render-in-quote (last-quote (js->clj %1 :keywordize-keys true))))
-            :error #(do (js/clearTimeout @ajax-timeout) (render-in-quote (error-quote)))})))
+            {:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render-content (spinner))) 1000))
+            :success #(do (js/clearTimeout @ajax-timeout) (render-content (last-quote (js->clj %1 :keywordize-keys true))))
+            :error #(do (js/clearTimeout @ajax-timeout) (render-content (error-quote)))})))
 
 (defn get-offenders
     [path]
     (let [ajax-timeout (atom 0)]
         (get-ajax path
-            {:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render-in-quote (spinner))) 1000))
-            :success #(do (js/clearTimeout @ajax-timeout) (render-offenders-table (:data (js->clj %1 :keywordize-keys true))))
-            :error #(do (js/clearTimeout @ajax-timeout) (render-in-quote (error-quote)))})))
+            {:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render-content (spinner))) 1000))
+            :success #(do (js/clearTimeout @ajax-timeout) (render-content (offenders-table (:data (js->clj %1 :keywordize-keys true)))))
+            :error #(do (js/clearTimeout @ajax-timeout) (render-content (error-quote)))})))
 
 
 

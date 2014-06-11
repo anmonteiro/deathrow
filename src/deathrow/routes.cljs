@@ -13,20 +13,17 @@
 	[]
 	(secretary/dispatch! (random-path)))
 
-(comment (defroute offenders-path "/offenders"
-	[]
-	(secretary/dispatch! (random-path)))
-)
-
-(defroute offenders-path-page #"/offenders(/page/(\d+))?"
+(defroute offenders-path #"/offenders(/page/(\d+))?"
 	[group id]
-	(.log js/console group)
-	(.log js/console id)
-	)
-;(offenders/get-offenders (offenders-path))
+	(offenders/get-offenders (str "/offenders" group)))
+
 (defroute random-path "/offenders/random"
 	[]
 	(offenders/get-random-offender (random-path)))
+
+(defroute error-path "*"
+	[path]
+	(log "ERROR: NOT FOUND"))
 
 (navigate-callback
 	#(do (log "NAVIGATE event")
@@ -34,6 +31,7 @@
 		;(.preventDefault %)
 		;(.setToken hist (.-token %))
 		(secretary/dispatch! (.-token %))))
+
 
 
 

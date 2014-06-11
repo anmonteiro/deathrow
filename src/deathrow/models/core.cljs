@@ -19,7 +19,7 @@
 
 (defn get-ajax
     [path settings]
-    (ajax (str C/AJAX-HOSTNAME path)
+    (ajax (str C/AJAX-ENDPOINT path)
         (merge
         	{:dataType "json"
         	:timeout 10000} settings)))

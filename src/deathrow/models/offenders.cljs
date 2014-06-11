@@ -27,9 +27,6 @@
     [view]
     (render content-container view))
 
-(defn render-offenders-table
-    [offenders]
-    )
 
 (defn get-random-offender
     [path]

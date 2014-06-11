@@ -9,12 +9,13 @@
 ;; Shouldn't need to wrap under div.panel-body
 (defelem quote-wrapper
 	[content]
-	[:div.panel-body
-		[:div.row
-			[:div.col-md-10.col-md-offset-1.well.quote content]]
-		[:div.col-md-4.col-md-offset-4.text-center
-			[:a.btn.btn-default.load-statement {:href "/offenders/random"}
-				"Load another random statement!"]]])
+	[:div.panel.panel-default
+		[:div.panel-body
+			[:div.row
+				[:div.col-md-10.col-md-offset-1.well.quote content]]
+			[:div.col-md-4.col-md-offset-4.text-center
+				[:a.btn.btn-default.load-statement {:href "/offenders/random"}
+					"Load another random statement!"]]]])
 
 (defpartial last-quote
 	[offender]

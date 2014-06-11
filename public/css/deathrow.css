@@ -1,3 +1,7 @@
 .navbar-nav > li {
       float: none;
 }
+
+.pager {
+	margin: 0;
+}

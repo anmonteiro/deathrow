@@ -22,7 +22,7 @@
 	(offenders/get-random-offender (random-path)))
 
 (defroute error-path "*"
-	[path]
+	[]
 	(log "ERROR: NOT FOUND"))
 
 (navigate-callback

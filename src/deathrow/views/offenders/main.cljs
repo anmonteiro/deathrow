@@ -12,12 +12,21 @@
 		[:td (:age offender)]])
 
 (defpartial offenders-table
-  [offenders]
-  [:table.table.table-hover
-  	[:thead
-  		[:tr
-  			[:th "#"]
-  			[:th "Name"]
-  			[:th "Race"]
-  			[:th "Age"]]]
-  	[:tbody (for [offender offenders] (offender-row offender))]])
+	[offenders]
+	[:div.panel.panel-default
+		[:div.panel-heading
+			[:ul.pager
+				[:li.previous.disabled
+					[:a {:href "deathrow"} (crate/raw "&larr; Older")]]
+				[:li.next
+					[:a {:href "deathrow"} (crate/raw "Newer &rarr;")]]]]
+		[:table.table.table-hover
+			[:thead
+		  		[:tr
+		  			[:th "#"]
+		  			[:th "Name"]
+		  			[:th "Race"]
+		  			[:th "Age"]]]
+		  	[:tbody (for [offender offenders] (offender-row offender))]]
+		[:div.panel-footer]])
+

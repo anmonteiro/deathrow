@@ -1,53 +1,21 @@
 (ns deathrow.routes
-	(:use-macros [deathrow.macros :only [render-quote-container]])
 	(:require
 		[jayq.core :as jayq :refer [$ ajax]]
 		[deathrow.util :refer [log]]
-		[deathrow.history :as h]
-		[deathrow.constants :as c]
-		[deathrow.views :as v]
-		[secretary.core :as secretary :include-macros true :refer [defroute]]
-		;[waltz.state :as state]
-		))
-
-;; No need for this just yet
-;; (:use-macros [waltz.macros :only [in out defstate defevent]])
-
-
-(def quote-container ($ :.quote))
-
-(defn render
-	[$elem view]
-	(-> $elem
-		.empty
-		(.append view)))
-
-(defn block-internal-urls
-	[]
-	(let
-		[$urls ($ "a")
-		host (-> js/window
-				.-location
-				.-hostname)]
-		(.on $urls "click"
-			(fn [e]
-				(when (= (.-hostname (.-target e)) host)
-					(do (.preventDefault e)
-						(h/dispatch! (.-pathname (.-target e)))))))))
-
+		[deathrow.history :as h :refer [navigate-callback]]
+		[deathrow.constants :as C]
+		[deathrow.templates.main :as m :refer [spinner]]
+		[deathrow.templates.offenders.random :as t :refer [last-quote error-quote quote-wrapper]]
+		[deathrow.views.core :as v :refer [render]]
+		[deathrow.views.offenders.random :as views]
+		[secretary.core :as secretary :include-macros true :refer [defroute]]))
 
 (declare random-path)
 (declare offenders-path)
 
 (defroute root-path "/"
 	[]
-	(let [ajax-timeout (atom 0)]
-		(ajax "http://deathrow.herokuapp.com/offenders/random"
-			{:dataType "json"
-			:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render-quote-container v/spinner)) 1000))
-			:success #(do (js/clearTimeout @ajax-timeout) (render-quote-container (v/last-quote (js->clj %1 :keywordize-keys true))))
-			:error #(do (js/clearTimeout @ajax-timeout) (render-quote-container v/error-quote))
-			:timeout 10000})))
+	(secretary/dispatch! (random-path)))
 
 (defroute offenders-path "/offenders"
 	[]
@@ -55,9 +23,15 @@
 
 (defroute random-path "/offenders/random"
 	[]
-	)
+	(let [ajax-timeout (atom 0)]
+		(ajax (str C/AJAX-HOSTNAME (random-path))
+			{:dataType "json"
+			:beforeSend #(reset! ajax-timeout (js/setTimeout (fn [] (render views/quote-container spinner)) 1000))
+			:success #(do (js/clearTimeout @ajax-timeout) (render views/quote-container (last-quote (js->clj %1 :keywordize-keys true))))
+			:error #(do (js/clearTimeout @ajax-timeout) (render views/quote-container (error-quote)))
+			:timeout 10000})))
 
-(h/navigate-callback
+(navigate-callback
 	#(do (log "NAVIGATE event")
 		(log (str "TOKEN: " (.-token %)))
 		;(.preventDefault %)

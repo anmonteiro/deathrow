@@ -21,7 +21,7 @@
 			;; hack for GitHub pages
 			;; see jekyll/#332 (https://github.com/jekyll/jekyll/issues/332)
 			;; for an explanation
-			(.setPathPrefix (str C/basepath)))
+			(.setPathPrefix (str C/BASEPATH)))
 		hist))
 
 (defn navigate-callback
@@ -47,6 +47,9 @@
 (defn dispatch!
 	[url]
 	(.setToken history url)
+	;; the reference to the previous token in history serves
+	;; the purpose of refreshing the data. Pending is still a
+	;; decision if this is final.
 	(if (= url @prev)
 		(.dispatchEvent history (goog.history.Event. url false))
 		(reset! prev url)))

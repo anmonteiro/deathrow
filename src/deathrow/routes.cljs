@@ -13,9 +13,12 @@
 	[]
 	(secretary/dispatch! (random-path)))
 
-(defroute offenders-path #"/offenders(/page/(\d+))?"
-	[group id]
-	(offenders/get-offenders (str "/offenders" group)))
+(defroute offenders-path #"(/offenders((/page)?(/\d+)?))"
+	[match rest page id]
+	(if (or (empty? rest) (not (empty? page)))
+		(offenders/get-offenders match)
+		(offenders/get-random-offender match)
+	))
 
 (defroute random-path "/offenders/random"
 	[]
@@ -26,8 +29,8 @@
 	(log "ERROR: NOT FOUND"))
 
 (navigate-callback
-	#(do (log "NAVIGATE event")
-		(log (str "TOKEN: " (.-token %)))
+	#(do ;(log "NAVIGATE event")
+		;(log (str "TOKEN: " (.-token %)))
 		;(.preventDefault %)
 		;(.setToken hist (.-token %))
 		(secretary/dispatch! (.-token %))))

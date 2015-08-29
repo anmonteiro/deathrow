@@ -2,31 +2,32 @@
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
 
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 [org.clojure/clojurescript "0.0-2173"]
+  :dependencies [[org.clojure/clojure "1.7.0"]
+                 [org.clojure/clojurescript "1.7.48"]
                  [crate "0.2.4"]
-                 [jayq "2.5.1"]
-                 [secretary "1.1.1"]
-                 ;[waltz "0.1.0-alpha1"]
-                 ]
+                 [secretary "1.2.3"]
+                 [org.omcljs/om "0.9.0"]]
 
-  :plugins [[lein-cljsbuild "1.0.2"]
+  :plugins [[lein-cljsbuild "1.1.0"]
             [com.cemerick/clojurescript.test "0.3.1"]]
   :source-paths ["src"]
+  :clean-targets [[:cljsbuild :builds 0 :compiler :output-dir]
+                  [:cljsbuild :builds 0 :compiler :output-to]]
   :cljsbuild {
-    :builds [{:id "deathrow"
+    :builds [{:id "dev"
               :source-paths ["src"]
               :compiler {
+                :main deathrow.core
                 :output-to "public/js/deathrow.js"
                 :output-dir "out"
                 :optimizations :none
                 :source-map true
                 }}
-                {:id "production"
+                {:id "prod"
                  :source-paths ["src"]
                  :compiler {
+                  :main deathrow.core
                   :output-to "public/js/deathrow.js"
-                  :externs ["externs/jquery-1.9.1.extern.js"]
                   :optimizations :advanced
                   :pretty-print false
                 }}
@@ -38,7 +39,4 @@
                 :optimizations :none
                 }}]
   :test-commands {"unit-tests" ["node" :node-runner
-                                  "public/js/jquery-2.1.1.min.js"
-                                  "target/test/deathrow.test.js"]}
-  :main deathrow.core})
-
+                                  "target/test/deathrow.test.js"]}})

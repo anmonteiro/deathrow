@@ -1,6 +1,5 @@
 (ns deathrow.history
   (:require
-    [deathrow.util :refer [log]]
     [deathrow.constants :as C]
     [secretary.core :as secretary]
     [goog.events :as events]
@@ -17,7 +16,7 @@
                (goog.history.Html5History.)
                (goog.History.))]
     (doto hist
-      (.setUseFragment false)
+      (.setUseFragment true)
       ;; hack for GitHub pages
       ;; see jekyll/#332 (https://github.com/jekyll/jekyll/issues/332)
       ;; for an explanation

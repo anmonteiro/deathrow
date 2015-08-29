@@ -6,9 +6,8 @@ pom.xml.asc
 /target/
 /checkouts/
 /repl/
+/out/
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/
 .lein-failures
-
-death-row.sublime*

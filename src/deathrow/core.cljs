@@ -1,13 +1,6 @@
 (ns deathrow.core
   (:require
-    [deathrow.util :refer [log]]
-    [deathrow.routes :as routes]
-    [deathrow.models.core :as view]))
+    [deathrow.utils :as utils :refer [log]]
+    [deathrow.routes :as routes]))
 
-
-(defn init
-  []
-  (view/block-internal-urls))
-
-
-(init)
+;(utils/block-internal-urls)

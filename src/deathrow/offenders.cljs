@@ -7,31 +7,27 @@
 
 (defn pager
   [state owner]
-  (reify
-    om/IRender
-    (render [_]
-      (let [{:keys [prev next]} state]
-        (dom/ul #js {:className "pager"}
-          (dom/li #js {:className (str "previous" (when (zero? prev) " disabled"))}
-            (dom/a #js {:href (when (not (zero? prev)) (str "#/offenders/page/" prev))
-            ;; TODO: don't use dangerouslySetInnerHTML
-              :dangerouslySetInnerHTML #js {:__html "&larr; Previous"}}))
-          (dom/li #js {:className "next"}
-            (dom/a #js {:href (str "#/offenders/page/" next)
-              :dangerouslySetInnerHTML #js {:__html "Next &rarr;"}})))))))
+  (om/component
+    (let [{:keys [prev next]} state]
+      (dom/ul #js {:className "pager"}
+        (dom/li #js {:className (str "previous" (when (zero? prev) " disabled"))}
+          (let [text "← Previous"]
+            (if (pos? prev)
+              (dom/a #js {:href (str "#/offenders/page/" prev)} text)
+              (dom/span nil text))))
+        (dom/li #js {:className "next"}
+          (dom/a #js {:href (str "#/offenders/page/" next)} "Next →"))))))
 
 (defn offender-row
   [offender owner]
-  (reify
-    om/IRender
-    (render [_]
-      (dom/tr nil
-        (dom/td nil (:executionNo offender))
-        (dom/td nil
-          (dom/a #js{:href (str "#/offenders/" (:executionNo offender))}))
-        (dom/td nil (utils/display-name offender))
-        (dom/td nil (:race offender))
-        (dom/td nil (:age offender))))))
+  (om/component
+    (dom/tr nil
+      (dom/td nil (:executionNo offender))
+      (dom/td nil
+        (dom/a #js{:href (str "#/offenders/" (:executionNo offender))}))
+      (dom/td nil (utils/display-name offender))
+      (dom/td nil (:race offender))
+      (dom/td nil (:age offender)))))
 
 (defn offenders-table
   [state owner]
@@ -59,6 +55,7 @@
       {:error false})
     om/IWillMount
     (will-mount [_]
+      (utils/highlight-nav 2)
       (utils/get-ajax (:path state)
                       {:success
                       #(om/transact! state

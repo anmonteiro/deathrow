@@ -38,6 +38,7 @@
         :error false})
     om/IWillMount
     (will-mount [_]
+      (utils/highlight-nav 1)
       (om/set-state! owner :loading true)
       (utils/get-ajax (:path data)
                       {:success #(on-receive-offender data owner %)

@@ -1,19 +1,19 @@
 (defproject deathrow "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
-  :url "http://example.com/FIXME"
+  :description "Random last statements by executed offenders"
+  :url "http://anmonteiro.com/deathrow"
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.48" :classifier "aot"
+                 [org.clojure/clojurescript "1.7.122"
                   :exclusion [org.clojure/data.json]]
                  [secretary "1.2.3"]
-                 [org.omcljs/om "0.9.0"]
-                 [org.clojure/data.json "0.2.6" :classifier "aot"]]
+                 [org.omcljs/om "0.9.0"]]
 
   :plugins [[lein-cljsbuild "1.1.0"]
-            [com.cemerick/clojurescript.test "0.3.1"]]
+            [com.cemerick/clojurescript.test "0.3.3"]]
   :source-paths ["src"]
   :clean-targets [[:cljsbuild :builds 0 :compiler :output-dir]
-                  [:cljsbuild :builds 0 :compiler :output-to]]
+                  [:cljsbuild :builds 0 :compiler :output-to]
+                  "target"]
   :cljsbuild {
     :builds [{:id "dev"
               :source-paths ["src"]

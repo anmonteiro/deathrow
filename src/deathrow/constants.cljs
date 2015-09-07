@@ -1,4 +1,4 @@
 (ns deathrow.constants)
 
 (def BASEPATH "/deathrow")
-(def AJAX-ENDPOINT "http://deathrow.herokuapp.com")
+(def AJAX-ENDPOINT "https://deathrow.herokuapp.com")

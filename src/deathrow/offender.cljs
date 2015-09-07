@@ -1,10 +1,9 @@
 (ns deathrow.offender
-  (:require
-    [om.core :as om]
-    [om.dom :as dom]
-    [deathrow.common :as c]
-    [deathrow.utils :as utils]
-    [goog.string :as gstr]))
+  (:require [om.core :as om]
+            [om.dom :as dom]
+            [deathrow.common :as c]
+            [deathrow.utils :as utils]
+            [goog.string :as gstr]))
 
 (def view-state (atom {:path nil
                        :offender nil}))

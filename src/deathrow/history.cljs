@@ -1,56 +1,57 @@
 (ns deathrow.history
-  (:require
-    [deathrow.constants :as C]
-    [secretary.core :as secretary]
-    [goog.events :as events]
-    [goog.History :as History]
-    [goog.history.EventType :as EventType]
-    [goog.history.Html5History :as Html5History]))
+  (:require [clojure.string :as string]
+            [deathrow.constants :as C]
+            [goog.events :as events]
+            [goog.History :as History]
+            [goog.history.Html5History :as Html5History]
+            [secretary.core :as secretary]))
 
-(declare history)
-(def prev (atom "/"))
+(def ^:private *history*)
 
-(defn init-history
-  []
-  (let [hist (if (Html5History/isSupported)
-               (goog.history.Html5History.)
-               (goog.History.))]
-    (doto hist
-      (.setUseFragment true)
-      ;; hack for GitHub pages
-      ;; see jekyll/#332 (https://github.com/jekyll/jekyll/issues/332)
-      ;; for an explanation
-      (.setPathPrefix (str C/BASEPATH)))
-    hist))
-
-(defn navigate-callback
-  ([callback-fn]
-   (navigate-callback history callback-fn))
-  ([hist callback-fn]
-   (doto history
-     (events/listen EventType/NAVIGATE
+(defn navigate-callback [hist callback-fn]
+   (doto hist
+     (events/listen goog.history.EventType.NAVIGATE
                     (fn [e]
-                      (callback-fn e)))
-     (.setEnabled true))))
+                      (callback-fn e)))))
 
-(defn get-token
-  []
+(defn get-token [history]
   (.getToken history))
 
-(defn set-token!
-  [token]
+(defn set-token! [history token]
   (.setToken history token))
 
-(defn replace-token! [token] (.replaceToken history token))
+(defn replace-token!
+  ([token] (replace-token! *history* token))
+  ([history token]
+    (.replaceToken history token)))
 
-(defn dispatch!
-  [url]
-  (.setToken history url)
-  ;; the reference to the previous token in history serves
-  ;; the purpose of refreshing the data. Pending is still a
-  ;; decision if this is final.
-  (if (= url @prev)
-    (.dispatchEvent history (goog.history.Event. url false))
-    (reset! prev url)))
+(defn disable-erroneous-popstate! [history]
+  (if (.-useFragment_ history)
+      (events/unlisten (.-window_ history)
+                       goog.events.EventType.POPSTATE
+                       (.-onHistoryEvent_ history)
+                       false
+                       history)))
 
-(def history (init-history))
+(defn setup-link-dispatcher! [history]
+  (events/listen js/document "click"
+                (fn [e]
+                  (let [target (.. e -target)
+                        tag-name (.-tagName target)
+                        token (str (.-pathname target) (.-search target) (.-hash target))]
+                    (when (= tag-name "A")
+                      (.preventDefault e)
+                      (replace-token! history token))))))
+
+(defn init-history []
+  (let [hist (if (Html5History/isSupported)
+               (goog.history.Html5History. js/window)
+               (goog.History.))]
+    (set! *history* hist)
+    (doto hist
+      (.setUseFragment true)
+      (.setPathPrefix "/")
+      (navigate-callback #(secretary/dispatch! (.-token %)))
+      (disable-erroneous-popstate!)
+      (.setEnabled true)
+      (setup-link-dispatcher!))))

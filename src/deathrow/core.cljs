@@ -1,35 +1,25 @@
 (ns deathrow.core
-  (:require
-    [deathrow.utils :as utils]
-    [deathrow.history :as h :refer [navigate-callback]]
-    [secretary.core :as secretary :refer-macros [defroute]]
-    [deathrow.offender :as o]
-    [deathrow.offenders :as os]
-    [om.core :as om]))
+  (:require [deathrow.history :as history]
+            [deathrow.offender :as o]
+            [deathrow.offenders :as os]
+            [secretary.core :as secretary :refer-macros [defroute]]))
 
 (declare random-path)
-(declare offenders-path)
 
-(defroute root-path "/"
-  []
-  (h/dispatch! (random-path)))
+(defn define-routes! []
+  (defroute root-path "/" []
+    (history/replace-token! (random-path)))
+  (defroute offenders-path #"(/offenders((/page)?(/\d+)?))" [match rest page id]
+    (if (or (empty? rest) (not (empty? page)))
+      (os/root match)
+      (o/root match)))
+  (defroute random-path "/offenders/random" []
+    (o/root))
+  (defroute error-path "*" []
+    (.log js/console "ERROR: NOT FOUND")))
 
-(defroute offenders-path #"(/offenders((/page)?(/\d+)?))"
-  [match rest page id]
-  (if (or (empty? rest) (not (empty? page)))
-    (os/root match)
-    (o/root match)))
+(defn setup! []
+  (define-routes!)
+  (history/init-history))
 
-(defroute random-path "/offenders/random" []
-  (o/root))
-
-(defroute error-path "*"
-  []
-  (utils/log "ERROR: NOT FOUND"))
-
-(navigate-callback
-  #(do ;(log "NAVIGATE event")
-     ;(log (str "TOKEN: " (.-token %)))
-     ;(.preventDefault %)
-     ;(.setToken hist (.-token %))
-     (secretary/dispatch! (.-token %))))
+(setup!)

@@ -1,9 +1,8 @@
 (ns deathrow.utils
-  (:require
-    [deathrow.constants :as C]
-    [deathrow.history :as h]
-    [goog.net.XhrIo :as xhr]
-    [goog.events :as gevts]))
+  (:require [deathrow.constants :as C]
+            [deathrow.history :as h]
+            [goog.net.XhrIo :as xhr]
+            [goog.events :as gevts]))
 
 (defn log [v & text]
   (let [vs (if (string? v)

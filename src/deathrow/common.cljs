@@ -1,7 +1,6 @@
 (ns deathrow.common
-  (:require
-    [om.core :as om :include-macros true]
-    [om.dom :as dom]))
+  (:require [om.core :as om :include-macros true]
+            [om.dom :as dom]))
 
 (defn error-msg
   [state owner]
@@ -33,5 +32,5 @@
             (om/build (:view opts) state)))
         (dom/div #js{:className "col-md-4 col-md-offset-4 text-center"}
           (dom/a #js{:className "btn btn-default load-statement"
-                    :href "#/offenders/random"}
+                    :href "/offenders/random"}
                   "Load another random statement")))))))

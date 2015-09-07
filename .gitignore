@@ -13,5 +13,7 @@ pom.xml.asc
 .lein-failures
 
 figwheel_server.log
-resources/public/js/out
-resources/public/js/deathrow.js
+resources/public/assets/js/out
+resources/public/assets/js/out-adv
+resources/public/assets/js/deathrow.js
+/dist

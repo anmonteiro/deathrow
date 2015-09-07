@@ -1,9 +1,9 @@
 (ns deathrow.offenders
-  (:require
-    [om.core :as om]
-    [om.dom :as dom]
-    [deathrow.utils :as utils]
-    [deathrow.common :as c]))
+  (:require [deathrow.utils :as utils]
+            [deathrow.common :as c]
+            [goog.string :as gstr]
+            [om.core :as om]
+            [om.dom :as dom]))
 
 (defn pager
   [state owner]
@@ -11,12 +11,12 @@
     (let [{:keys [prev next]} state]
       (dom/ul #js {:className "pager"}
         (dom/li #js {:className (str "previous" (when (zero? prev) " disabled"))}
-          (let [text "← Previous"]
+          (let [text (gstr/unescapeEntities "&larr; Previous")]
             (if (pos? prev)
-              (dom/a #js {:href (str "#/offenders/page/" prev)} text)
+              (dom/a #js {:href (str "/offenders/page/" prev)} text)
               (dom/span nil text))))
         (dom/li #js {:className "next"}
-          (dom/a #js {:href (str "#/offenders/page/" next)} "Next →"))))))
+          (dom/a #js {:href (str "/offenders/page/" next)} (gstr/unescapeEntities "Next &rarr;")))))))
 
 (defn offender-row
   [offender owner]
@@ -24,7 +24,7 @@
     (dom/tr nil
       (dom/td nil (:executionNo offender))
       (dom/td nil
-        (dom/a #js{:href (str "#/offenders/" (:executionNo offender))}))
+        (dom/a #js{:href (str "/offenders/" (:executionNo offender))}))
       (dom/td nil (utils/display-name offender))
       (dom/td nil (:race offender))
       (dom/td nil (:age offender)))))

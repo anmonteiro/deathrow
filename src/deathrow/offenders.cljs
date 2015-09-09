@@ -1,9 +1,13 @@
 (ns deathrow.offenders
-  (:require [deathrow.utils :as utils]
-            [deathrow.common :as c]
+  (:require [deathrow.common :as c]
+            [deathrow.utils :as utils]
             [goog.string :as gstr]
             [om.core :as om]
             [om.dom :as dom]))
+
+(defn on-receive-data [state owner data]
+  (om/transact! state
+                #(merge % (js->clj data :keywordize-keys true))))
 
 (defn pager
   [state owner]
@@ -24,51 +28,43 @@
     (dom/tr nil
       (dom/td nil (:executionNo offender))
       (dom/td nil
-        (dom/a #js{:href (str "/offenders/" (:executionNo offender))}))
-      (dom/td nil (utils/display-name offender))
+        (dom/a #js{:href (str "/offenders/" (:executionNo offender))}
+               (utils/display-name offender)))
       (dom/td nil (:race offender))
       (dom/td nil (:age offender)))))
+
+(defn offenders-partial
+  [cl-name state owner]
+  (om/component
+    (dom/div #js{:className cl-name}
+      (om/build pager (:paging state)))))
 
 (defn offenders-table
   [state owner]
   (om/component
-    (let [paging (:paging state)
-          pager (om/build pager paging)]
-      (dom/div #js{:className "panel panel-default"}
-        (dom/div #js{:className "panel-heading"} pager)
-        (dom/table #js{:className "table table-hover"}
-          (dom/thead nil
-            (dom/tr nil
-              (dom/th nil "Execution #")
-              (dom/th nil "Name")
-              (dom/th nil "Race")
-              (dom/th nil "Age")))
-          (dom/tbody nil
-            (om/build-all offender-row (:data state))))
-        (dom/div #js{:className "panel-footer text-center"} pager)))))
+    (dom/table #js{:className "table table-hover"}
+      (dom/thead nil
+        (dom/tr nil
+          (dom/th nil "Execution #")
+          (dom/th nil "Name")
+          (dom/th nil "Race")
+          (dom/th nil "Age")))
+      (dom/tbody nil
+        (om/build-all offender-row (:data state))))))
 
 (defn offenders-component
   [state owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:error false})
-    om/IWillMount
-    (will-mount [_]
-      (utils/highlight-nav 2)
-      (utils/get-ajax (:path state)
-                      {:success
-                      #(om/transact! state
-                        (fn [st]
-                          (merge st (js->clj % :keywordize-keys true))))
-                        :error #(om/set-state! owner :error true)}))
-    om/IRenderState
-    (render-state [_ {:keys [error]}]
-      (cond
-        error (om/build c/generic-panel {} {:opts {:view c/error-msg}})
-        :else (om/build offenders-table state)))))
+  (om/component
+    (om/build c/generic-panel
+              state
+              {:opts {:view offenders-table
+                      :heading (partial offenders-partial "panel-heading")
+                      :footer (partial offenders-partial "panel-footer")}})))
 
-(defn root
-  [path]
-  (om/root offenders-component {:path path}
-    {:target (. js/document (getElementById "content"))}))
+(defn- build-app-state []
+  (merge @c/app-state {:nav-pos 2
+                        :on-success on-receive-data}))
+
+(defn root [path]
+  (om/root offenders-component (assoc (build-app-state) :path path)
+           {:target c/app-element}))

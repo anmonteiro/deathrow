@@ -1,8 +1,10 @@
 (ns deathrow.utils
   (:require [deathrow.constants :as C]
             [deathrow.history :as h]
+            [goog.dom.DomHelper]
+            [goog.events :as gevts]
             [goog.net.XhrIo :as xhr]
-            [goog.events :as gevts]))
+            [goog.string :as gstr]))
 
 (defn log [v & text]
   (let [vs (if (string? v)
@@ -10,6 +12,14 @@
              v)]
     (. js/console (log vs))
     v))
+
+(defn normalize-string
+  [html-string]
+  (let [dom-helper (goog.dom.DomHelper.)
+        html-string (gstr/unescapeEntities html-string)]
+    (->> html-string
+         (.htmlToDocumentFragment dom-helper)
+         (.getTextContent dom-helper))))
 
 (defn display-name
   [{:keys [firstName lastName]}]

@@ -1,9 +1,8 @@
 (ns deathrow.offender
-  (:require [om.core :as om]
-            [om.dom :as dom]
-            [deathrow.common :as c]
+  (:require [deathrow.common :as c]
             [deathrow.utils :as utils]
-            [goog.string :as gstr]))
+            [om.core :as om]
+            [om.dom :as dom]))
 
 (defn on-receive-offender
   [state owner data]
@@ -15,8 +14,7 @@
   (om/component
     (let [offender (:data state)]
       (dom/blockquote nil
-        ;; TODO: is this something we want to be doing here or in e.g. IWillUpdate?
-        (dom/p nil (gstr/unescapeEntities (:lastStmt offender)))
+        (dom/p nil (utils/normalize-string (:lastStmt offender)))
         (dom/footer nil
           (dom/cite #js{:title (utils/display-name offender)}
             (dom/a #js{:href (:profileUrl offender)}

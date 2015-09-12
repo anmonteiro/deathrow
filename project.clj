@@ -19,7 +19,7 @@
   :figwheel {:css-dirs ["resources/public/assets/css"]}
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src"]
-                        :figwheel true
+                        :figwheel {:on-jsload "deathrow.core/fig-reload-hook"}
                         :compiler {:main deathrow.core
                                    :asset-path "assets/js/out"
                                    :output-to "resources/public/assets/js/deathrow.js"

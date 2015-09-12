@@ -22,4 +22,11 @@
   (define-routes!)
   (history/init-history))
 
+(defn- teardown! []
+  (history/dispose!))
+
+(defn fig-reload-hook []
+  (teardown!)
+  (setup!))
+
 (setup!)

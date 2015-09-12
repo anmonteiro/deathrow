@@ -6,13 +6,15 @@
             [goog.history.Html5History :as Html5History]
             [secretary.core :as secretary]))
 
-(def ^:private *history*)
+(defonce ^{:private true
+           :dynamic true} *history* nil)
+
+(defonce ^{:private true
+           :dynamic true} *event-keys* [])
 
 (defn navigate-callback [hist callback-fn]
-   (doto hist
-     (events/listen goog.history.EventType.NAVIGATE
-                    (fn [e]
-                      (callback-fn e)))))
+  (let [key (events/listen hist goog.history.EventType.NAVIGATE callback-fn)]
+    (set! *event-keys* (conj *event-keys* key))))
 
 (defn get-token [history]
   (.getToken history))
@@ -33,15 +35,33 @@
                        false
                        history)))
 
+(defn- handle-click [e]
+  (let [target (.. e -target)
+        tag-name (.-tagName target)
+        token (str (.-pathname target) (.-search target) (.-hash target))
+        target-host (.. target -hostname)
+        curr-host (.. js/window -location -hostname)]
+    (when (and (= tag-name "A") (= curr-host target-host))
+      (.preventDefault e)
+      (replace-token! token))))
+
 (defn setup-link-dispatcher! [history]
-  (events/listen js/document "click"
-                (fn [e]
-                  (let [target (.. e -target)
-                        tag-name (.-tagName target)
-                        token (str (.-pathname target) (.-search target) (.-hash target))]
-                    (when (= tag-name "A")
-                      (.preventDefault e)
-                      (replace-token! history token))))))
+  (let [key (events/listen js/document "click" handle-click)]
+    (set! *event-keys* (conj *event-keys* key))))
+
+(defn on-navigate-event [e]
+  (secretary/dispatch! (.-token e)))
+
+(defn- teardown-events! []
+  (doseq [k *event-keys*]
+    (events/unlistenByKey k))
+  (set! *event-keys* []))
+
+(defn- dispose! []
+  (when-let [hist *history*]
+    (teardown-events!)
+    (.dispose hist)
+    (set! *history* nil)))
 
 (defn init-history []
   (let [hist (if (Html5History/isSupported)
@@ -51,7 +71,7 @@
     (doto hist
       (.setUseFragment true)
       (.setPathPrefix "/")
-      (navigate-callback #(secretary/dispatch! (.-token %)))
+      (navigate-callback on-navigate-event)
       (disable-erroneous-popstate!)
       (.setEnabled true)
       (setup-link-dispatcher!))))

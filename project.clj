@@ -29,7 +29,6 @@
                        {:id "prod"
                         :source-paths ["src"]
                         :compiler {:output-to "resources/public/assets/js/deathrow.js"
-                                   :output-dir "resources/public/assets/js/out-adv"
                                    :elide-asserts true
                                    :optimizations :advanced
                                    :pretty-print false}}]}

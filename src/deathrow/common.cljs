@@ -6,9 +6,11 @@
 (def app-element (.getElementById js/document "content"))
 
 (def app-state (atom {:path nil
-                       :nav-pos nil
-                       :data nil
-                       :on-success nil}))
+                      :nav-pos nil
+                      :data nil
+                      :on-success nil
+                      :loading false
+                      :error false}))
 
 (defn panel-body-partial
   [content state owner]
@@ -46,13 +48,13 @@
 
 (defn on-success*
   [state owner data]
-  (om/update-state! owner #(assoc % :error false :loading false))
+  (om/transact! state #(assoc % :error false :loading false))
   (when-let [on-success (:on-success state)]
     (on-success state owner data)))
 
 (defn on-error*
   [state owner err]
-  (om/update-state! owner
+  (om/transact! state
                     #(assoc % :error true :loading false))
   (when-let [on-err (:on-error state)]
     (on-err state owner err)))
@@ -61,26 +63,22 @@
   ([app owner] (generic-panel app owner nil))
   ([app owner opts]
    (reify
-     om/IInitState
-     (init-state
-      [_]
-      {:loading false
-       :error false})
      om/IWillMount
      (will-mount [_]
       (utils/highlight-nav (:nav-pos app))
-      (om/set-state! owner :loading true)
+      (om/update! app :loading true)
       (utils/get-ajax (:path app)
                       {:success #(on-success* app owner %)
                        :error #(on-error* app owner %)}))
-     om/IRenderState
-     (render-state [_ {:keys [loading error]}]
-      (dom/div #js{:className "panel panel-default"}
-        (when-let [panel-heading (:heading opts)]
-          (om/build panel-heading app))
+     om/IRender
+     (render [_]
+      (let [{:keys [loading error]} app]
+        (dom/div #js{:className "panel panel-default"}
+          (when-let [panel-heading (:heading opts)]
+            (om/build panel-heading app))
           (cond
             loading (om/build spinner {})
             error (om/build error-msg {})
             :else (om/build (:view opts) app))
-        (when-let [panel-footer (:footer opts)]
-          (om/build panel-footer app)))))))
+          (when-let [panel-footer (:footer opts)]
+            (om/build panel-footer app))))))))

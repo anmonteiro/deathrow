@@ -12,15 +12,20 @@
 (defn pager
   [state owner]
   (om/component
-    (let [{:keys [prev next]} state]
+    (let [{:keys [prev next]} (:paging state)
+          loading (:loading state)]
       (dom/ul #js {:className "pager"}
-        (dom/li #js {:className (str "previous" (when (zero? prev) " disabled"))}
+        (dom/li #js {:className (str "previous" (when (or (zero? prev) loading) " disabled"))}
           (let [text (gstr/unescapeEntities "&larr; Previous")]
-            (if (pos? prev)
+            (if (and (pos? prev) (not loading))
               (dom/a #js {:href (str "/offenders/page/" prev)} text)
               (dom/span nil text))))
-        (dom/li #js {:className "next"}
-          (dom/a #js {:href (str "/offenders/page/" next)} (gstr/unescapeEntities "Next &rarr;")))))))
+        (dom/li #js {:className (str "next" (when loading " disabled"))}
+          (let [text (gstr/unescapeEntities "Next &rarr;")]
+            (if (not loading)
+              (dom/a #js {:href (str "/offenders/page/" next)} text)
+              (dom/span nil text))
+          ))))))
 
 (defn offender-row
   [offender owner]
@@ -37,7 +42,7 @@
   [cl-name state owner]
   (om/component
     (dom/div #js{:className cl-name}
-      (om/build pager (:paging state)))))
+      (om/build pager state))))
 
 (defn offenders-table
   [state owner]

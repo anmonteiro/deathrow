@@ -12,7 +12,7 @@
 (defn last-quote-view
   [state owner]
   (om/component
-    (let [offender (:data state)]
+    (when-let [offender (:data state)]
       (dom/blockquote nil
         (dom/p nil (utils/normalize-string (:lastStmt offender)))
         (dom/footer nil

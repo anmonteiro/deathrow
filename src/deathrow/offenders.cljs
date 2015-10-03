@@ -55,7 +55,7 @@
           (dom/th nil "Race")
           (dom/th nil "Age")))
       (dom/tbody nil
-        (om/build-all offender-row (:data state))))))
+        (om/build-all offender-row (:data state) {:key :executionNo})))))
 
 (defn offenders-component
   [state owner]

@@ -6,6 +6,12 @@
             [goog.net.XhrIo :as xhr]
             [goog.string :as gstr]))
 
+(defn set-display-name
+  [c name]
+  (set! (-> c
+          .-prototype
+          .-displayName) name))
+
 (defn log [v & text]
   (let [vs (if (string? v)
              (apply str v text)

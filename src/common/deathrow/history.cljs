@@ -16,11 +16,13 @@
   (let [key (events/listen hist goog.history.EventType.NAVIGATE callback-fn)]
     (set! *event-keys* (conj *event-keys* key))))
 
-(defn get-token [history]
-  (.getToken history))
+(defn get-token
+  ([] (get-token *history*))
+  ([history] (.getToken history)))
 
-(defn set-token! [history token]
-  (.setToken history token))
+(defn set-token!
+  ([token] (set-token! *history* token))
+  ([history token] (.setToken history token)))
 
 (defn replace-token!
   ([token] (replace-token! *history* token))
@@ -43,7 +45,7 @@
         curr-host (.. js/window -location -hostname)]
     (when (and (= tag-name "A") (= curr-host target-host))
       (.preventDefault e)
-      (replace-token! token))))
+      (set-token! *history* token))))
 
 (defn setup-link-dispatcher! [history]
   (let [key (events/listen js/document "click" handle-click)]

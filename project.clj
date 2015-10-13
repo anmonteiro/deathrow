@@ -3,18 +3,21 @@
   :url "http://anmonteiro.com/deathrow"
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.122"
-                  :exclusion [org.clojure/data.json]]
-                 [secretary "1.2.3"]
-                 [org.omcljs/om "0.9.0-SNAPSHOT"]]
+                 [org.clojure/clojurescript "1.7.145"
+                  :exclusion [org.clojure/data.json] :scope "provided"]
+                 [com.cognitect/transit-cljs "0.8.225"]
+                 [org.omcljs/om "1.0.0-alpha1-SNAPSHOT"]
+                 [secretary "1.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.0"]
-            [lein-figwheel "0.3.8"]
+            [lein-figwheel "0.4.1"]
             [com.cemerick/clojurescript.test "0.3.3"]]
   :clean-targets ^{:protect false} [[:cljsbuild :builds 0 :compiler :output-dir]
                                     [:cljsbuild :builds 0 :compiler :output-to]
                                     [:cljsbuild :builds 1 :compiler :output-to]
                                     "target"]
   :figwheel {:css-dirs ["resources/public/assets/css"]}
-  :aliases {"fig-om" ["do" ["clean"] ["with-profile" "+om" "figwheel" "dev"]]
-            "fig-next" ["do" ["clean"] ["with-profile" "+next" "figwheel" "dev"]]})
+  :aliases {"fig-om" ["do" ["with-profile" "+om" "clean"]
+                           ["with-profile" "+om" "figwheel" "dev"]]
+            "fig-next" ["do" ["with-profile" "+next" "clean"]
+                             ["with-profile" "+next" "figwheel" "dev"]]})

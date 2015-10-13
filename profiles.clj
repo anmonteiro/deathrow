@@ -9,7 +9,7 @@
                                       :optimizations :none
                                       :source-map true}}
                            {:id "prod"
-                            :source-paths ["src/om"]
+                            :source-paths ["src/common" "src/om"]
                             :compiler {:output-to "resources/public/assets/js/deathrow.js"
                                        :elide-asserts true
                                        :optimizations :advanced

@@ -6,7 +6,7 @@
                  [org.clojure/clojurescript "1.7.145"
                   :exclusion [org.clojure/data.json] :scope "provided"]
                  [com.cognitect/transit-cljs "0.8.225"]
-                 [org.omcljs/om "1.0.0-alpha1-SNAPSHOT"]
+                 [org.omcljs/om "1.0.0-alpha1"]
                  [secretary "1.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.0"]

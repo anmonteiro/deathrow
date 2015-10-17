@@ -6,7 +6,7 @@
                  [org.clojure/clojurescript "1.7.145"
                   :exclusion [org.clojure/data.json] :scope "provided"]
                  [com.cognitect/transit-cljs "0.8.225"]
-                 [org.omcljs/om "1.0.0-alpha1"]
+                 [org.omcljs/om "1.0.0-alpha4-SNAPSHOT"]
                  [secretary "1.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.0"]
@@ -20,4 +20,8 @@
   :aliases {"fig-om" ["do" ["with-profile" "+om" "clean"]
                            ["with-profile" "+om" "figwheel" "dev"]]
             "fig-next" ["do" ["with-profile" "+next" "clean"]
-                             ["with-profile" "+next" "figwheel" "dev"]]})
+                             ["with-profile" "+next" "figwheel" "dev"]]
+            "publish-om" ["do" ["with-profile" "+om" "clean"]
+                               ["with-profile" "+om" "cljsbuild" "once" "prod"]]
+            "publish-next" ["do" ["with-profile" "+next" "clean"]
+                               ["with-profile" "+next" "cljsbuild" "once" "prod"]]})

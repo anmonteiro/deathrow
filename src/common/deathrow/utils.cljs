@@ -30,7 +30,7 @@
 
 (defn display-name
   ([{:keys [firstName lastName]}]
-    display-name [firstName lastName])
+    (display-name firstName lastName))
   ([first last]
     (str first " " last)))
 

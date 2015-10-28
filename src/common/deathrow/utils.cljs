@@ -1,10 +1,11 @@
 (ns deathrow.utils
-  (:require [deathrow.constants :as C]
-            [deathrow.history :as h]
-            [goog.dom.DomHelper]
+  (:require [cognitect.transit :as t]
+            [deathrow.constants :as C]
             [goog.events :as gevts]
             [goog.net.XhrIo :as xhr]
-            [goog.string :as gstr]))
+            [goog.string :as gstr])
+  (:import [goog.net XhrIo]
+           [goog.dom DomHelper]))
 
 (defn set-display-name
   [c name]
@@ -21,15 +22,17 @@
 
 (defn normalize-string
   [html-string]
-  (let [dom-helper (goog.dom.DomHelper.)
+  (let [dom-helper (DomHelper.)
         html-string (gstr/unescapeEntities html-string)]
     (->> html-string
          (.htmlToDocumentFragment dom-helper)
          (.getTextContent dom-helper))))
 
 (defn display-name
-  [{:keys [firstName lastName]}]
-  (str firstName " " lastName))
+  ([{:keys [firstName lastName]}]
+    display-name [firstName lastName])
+  ([first last]
+    (str first " " last)))
 
 (defn highlight-nav
   [n]
@@ -47,7 +50,7 @@
         success-fn (:success settings)
         error-fn (:error settings)
         opts (apply dissoc settings [:success :error])]
-    (.setTimeoutInterval request 15000)
+    (.setTimeoutInterval request C/REMOTE-TIMEOUT)
     (gevts/listen request goog.net.EventType.COMPLETE
       (fn []
         (if (.isSuccess request)

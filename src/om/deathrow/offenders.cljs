@@ -24,8 +24,7 @@
           (let [text (gstr/unescapeEntities "Next &rarr;")]
             (if (not loading)
               (dom/a #js {:href (str "/offenders/page/" next)} text)
-              (dom/span nil text))
-          ))))))
+              (dom/span nil text))))))))
 
 (defn offender-row
   [offender owner]

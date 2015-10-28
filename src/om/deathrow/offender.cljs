@@ -6,8 +6,8 @@
 
 (defn on-receive-offender
   [state owner data]
-  (om/transact! state :data
-    #(js->clj data :keywordize-keys true)))
+  (om/transact! state
+                #(merge % (js->clj data :keywordize-keys true))))
 
 (defn last-quote-view
   [state owner]

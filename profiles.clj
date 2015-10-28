@@ -1,4 +1,5 @@
-{:om {:source-paths ["src/common" "src/om"]
+{:om {:dependencies [[org.omcljs/om "0.9.0"]]
+      :source-paths ["src/common" "src/om"]
       :cljsbuild {:builds [{:id "dev"
                            :source-paths ["src/common" "src/om"]
                            :figwheel {:on-jsload "deathrow.core/fig-reload-hook"}
@@ -14,7 +15,8 @@
                                        :elide-asserts true
                                        :optimizations :advanced
                                        :pretty-print false}}]}}
- :next {:source-paths ["src/common" "src/om-next"]
+ :next {:dependencies [[org.omcljs/om "1.0.0-alpha8"]]
+        :source-paths ["src/common" "src/om-next"]
         :cljsbuild {:builds [{:id "dev"
                               :source-paths ["src/common" "src/om-next"]
                               :figwheel {:on-jsload "deathrow.core/fig-reload-hook"}

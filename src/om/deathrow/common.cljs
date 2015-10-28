@@ -1,6 +1,7 @@
 (ns deathrow.common
-  (:require [deathrow.utils :as utils]
-            [om.core :as om :include-macros true]
+  (:require [deathrow.history :as h]
+            [deathrow.utils :as utils]
+            [om.core :as om]
             [om.dom :as dom]))
 
 (def app-element (.getElementById js/document "content"))
@@ -20,8 +21,8 @@
         (dom/div #js{:className "col-md-10 col-md-offset-1 well quote"}
           (om/build content state)))
       (dom/div #js{:className "col-md-4 col-md-offset-4 text-center"}
-        (dom/a #js{:className "btn btn-default load-statement"
-                   :href "/offenders/random"}
+        (dom/button #js{:className "btn btn-default load-statement"
+                        :onClick #(h/replace-token! "/offenders/random")}
           "Load another random statement")))))
 
 (defn error-msg*

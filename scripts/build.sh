@@ -66,8 +66,11 @@ fi
 
 set_verbose_output
 
+MASTER_DIR=checkout
+
 GIT_REPO_HEAD_SHA=$(git rev-parse --short HEAD)
 GIT_REPO_REMOTE_URL=$(git config --get remote.origin.url)
+GIT_MASTER_BRANCH=master
 GIT_DEPLOY_BRANCH=gh-pages
 GIT_SUBTREE_OPTS="--git-dir=$DIR/.git --work-tree=$DIR"
 
@@ -79,6 +82,9 @@ if [[ $OM = true ]]; then
 elif [[ $NEXT = true ]]; then
   LEIN_PROFILE="+next"
 fi
+
+git clone -b $GIT_MASTER_BRANCH --single-branch $GIT_REPO_REMOTE_URL $MASTER_DIR
+pushd $MASTER_DIR
 
 lein with-profile $LEIN_PROFILE clean
 lein with-profile $LEIN_PROFILE cljsbuild once prod
@@ -92,5 +98,6 @@ git $GIT_SUBTREE_OPTS add -A .
 git $GIT_SUBTREE_OPTS commit -am "deploy release of ${GIT_REPO_HEAD_SHA}"
 git $GIT_SUBTREE_OPTS push origin $GIT_DEPLOY_BRANCH
 
+popd
 # Cleanup
-rm -rf $DIR
+rm -rf $MASTER_DIR

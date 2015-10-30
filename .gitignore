@@ -7,13 +7,9 @@ pom.xml.asc
 /checkouts/
 /repl/
 /out/
-.lein-deps-sum
-.lein-repl-history
-.lein-plugins/
-.lein-failures
+/.lein-*
 
 figwheel_server.log
-resources/public/assets/js/out
-resources/public/assets/js/out-adv
-resources/public/assets/js/deathrow.js
-/dist
+resources/public/assets/js/*
+
+/checkout

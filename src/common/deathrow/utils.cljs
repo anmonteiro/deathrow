@@ -57,3 +57,34 @@
           (success-fn (.getResponseJson request))
           (error-fn (.getLastError request)))))
     (.send request (str C/AJAX-ENDPOINT path) "GET" (.toString opts))))
+
+
+;; =============================================================================
+;; Om Next
+
+(defn- keywordize-map-keys [m]
+  (if (map? m)
+    (into {} (map (fn [[k v]] [(keyword k) (keywordize-map-keys v)]) m))
+    (if (vector? m)
+      (into [] (map keywordize-map-keys m))
+      m)))
+
+(defn- get-res-keyword [edn]
+  (let [fedn (first edn)]
+    (cond
+      (keyword? fedn) fedn
+      (map? fedn) (ffirst fedn))))
+
+(defn get-ajax-next
+  [path]
+  (fn [edn cb]
+    (.send XhrIo (str C/AJAX-ENDPOINT path)
+           (fn [e]
+             (this-as this
+               (if (.isSuccess this)
+                 (let [res (t/read (t/reader :json) (.getResponseText this))
+                       res' (keywordize-map-keys res)]
+                   (cb res'))
+                 (cb {(get-res-keyword edn) :not-found}))))
+           "GET"
+           C/REMOTE-TIMEOUT)))

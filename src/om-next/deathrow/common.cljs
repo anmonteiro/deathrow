@@ -49,7 +49,7 @@
 
 (defui GenericPanel
   Object
-  (getInitialState [this]
+  (initLocalState [this]
     {:loading true
      :eror false})
   (componentWillReceiveProps [this next-props]

@@ -3,13 +3,15 @@
   :url "http://anmonteiro.com/deathrow"
 
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.145"
+                 [org.clojure/clojurescript "1.7.170"
                   :exclusion [org.clojure/data.json] :scope "provided"]
+                 [org.clojure/core.async "0.2.371" :scope "provided"]
+                 [org.omcljs/om "1.0.0-alpha19"]
                  [com.cognitect/transit-cljs "0.8.225"]
                  [secretary "1.2.3"]]
 
-  :plugins [[lein-cljsbuild "1.1.0"]
-            [lein-figwheel "0.4.1"]]
+  :plugins [[lein-cljsbuild "1.1.1"]
+            [lein-figwheel "0.5.0-SNAPSHOT"]]
   :clean-targets ^{:protect false} [[:cljsbuild :builds 0 :compiler :output-dir]
                                     [:cljsbuild :builds 0 :compiler :output-to]
                                     [:cljsbuild :builds 1 :compiler :output-to]

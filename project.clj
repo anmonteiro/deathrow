@@ -6,12 +6,12 @@
                  [org.clojure/clojurescript "1.7.170"
                   :exclusion [org.clojure/data.json] :scope "provided"]
                  [org.clojure/core.async "0.2.374" :scope "provided"]
-                 [org.omcljs/om "1.0.0-alpha23"]
+                 [org.omcljs/om "1.0.0-alpha24"]
                  [com.cognitect/transit-cljs "0.8.232"]
                  [secretary "1.2.3"]]
 
   :plugins [[lein-cljsbuild "1.1.1"]
-            [lein-figwheel "0.5.0-1"]]
+            [lein-figwheel "0.5.0-2"]]
   :clean-targets ^{:protect false} [[:cljsbuild :builds 0 :compiler :output-dir]
                                     [:cljsbuild :builds 0 :compiler :output-to]
                                     [:cljsbuild :builds 1 :compiler :output-to]

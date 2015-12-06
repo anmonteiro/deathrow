@@ -2,11 +2,11 @@
   :description "Random last statements by executed offenders"
   :url "http://anmonteiro.com/deathrow"
 
-  :dependencies [[org.clojure/clojure "1.8.0-RC2"]
-                 [org.clojure/clojurescript "1.7.170"
+  :dependencies [[org.clojure/clojure "1.8.0-RC3"]
+                 [org.clojure/clojurescript "1.7.189"
                   :exclusion [org.clojure/data.json] :scope "provided"]
                  [org.clojure/core.async "0.2.374" :scope "provided"]
-                 [org.omcljs/om "1.0.0-alpha24"]
+                 [org.omcljs/om "1.0.0-alpha25"]
                  [com.cognitect/transit-cljs "0.8.232"]
                  [secretary "1.2.3"]]
 

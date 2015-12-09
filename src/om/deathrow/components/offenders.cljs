@@ -1,13 +1,9 @@
-(ns deathrow.offenders
-  (:require [deathrow.common :as c]
+(ns deathrow.components.offenders
+  (:require [deathrow.components.common :as c]
             [deathrow.utils :as utils]
             [goog.string :as gstr]
             [om.core :as om]
             [om.dom :as dom]))
-
-(defn on-receive-data [state owner data]
-  (om/transact! state
-                #(merge % (js->clj data :keywordize-keys true))))
 
 (defn pager
   [state owner]
@@ -59,16 +55,8 @@
 (defn offenders-component
   [state owner]
   (om/component
-    (om/build c/generic-panel
-              state
-              {:opts {:view offenders-table
-                      :heading (partial offenders-partial "panel-heading")
-                      :footer (partial offenders-partial "panel-footer")}})))
-
-(defn- build-app-state []
-  (merge @c/app-state {:nav-pos 2
-                        :on-success on-receive-data}))
-
-(defn root [path]
-  (om/root offenders-component (assoc (build-app-state) :path path)
-           {:target c/app-element}))
+   (om/build c/generic-panel
+             state
+             {:opts {:view offenders-table
+                     :heading (partial offenders-partial "panel-heading")
+                     :footer (partial offenders-partial "panel-footer")}})))

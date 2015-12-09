@@ -30,7 +30,7 @@
     (.replaceToken history token)))
 
 (defn disable-erroneous-popstate! [history]
-  (if (.-useFragment_ history)
+  (when (.-useFragment_ history)
       (events/unlisten (.-window_ history)
                        goog.events.EventType.POPSTATE
                        (.-onHistoryEvent_ history)
@@ -52,6 +52,7 @@
     (set! *event-keys* (conj *event-keys* key))))
 
 (defn on-navigate-event [e]
+  (.log js/console "NAV: " (.-token e))
   (secretary/dispatch! (.-token e)))
 
 (defn- teardown-events! []
@@ -70,6 +71,7 @@
                (goog.history.Html5History. js/window)
                (goog.History.))]
     (set! *history* hist)
+    (.log js/console "TOKEN: " (get-token hist))
     (doto hist
       (.setUseFragment true)
       (.setPathPrefix "/")

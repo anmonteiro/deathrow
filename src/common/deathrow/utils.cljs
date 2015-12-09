@@ -1,5 +1,6 @@
 (ns deathrow.utils
   (:require [cognitect.transit :as t]
+            [cljs.core.async :as async]
             [deathrow.constants :as C]
             [goog.events :as gevts]
             [goog.net.XhrIo :as xhr]
@@ -22,11 +23,12 @@
 
 (defn normalize-string
   [html-string]
-  (let [dom-helper (DomHelper.)
-        html-string (gstr/unescapeEntities html-string)]
-    (->> html-string
-         (.htmlToDocumentFragment dom-helper)
-         (.getTextContent dom-helper))))
+  (when html-string
+    (let [dom-helper (DomHelper.)
+          html-string (gstr/unescapeEntities html-string)]
+      (->> html-string
+           (.htmlToDocumentFragment dom-helper)
+           (.getTextContent dom-helper)))))
 
 (defn display-name
   ([{:keys [firstName lastName]}]
@@ -34,6 +36,7 @@
   ([first last]
     (str first " " last)))
 
+;; DEPRECATED
 (defn highlight-nav
   [n]
   (let [all (-> js/Array
@@ -54,10 +57,15 @@
     (gevts/listen request goog.net.EventType.COMPLETE
       (fn []
         (if (.isSuccess request)
-          (success-fn (.getResponseJson request))
+          (success-fn (t/read (t/reader :json) (.getResponseText request)))
           (error-fn (.getLastError request)))))
     (.send request (str C/AJAX-ENDPOINT path) "GET" (.toString opts))))
 
+;; ==========
+;; Async utils
+
+(defn put! [ch val & args]
+  (apply async/put! ch val args))
 
 ;; =============================================================================
 ;; Om Next
@@ -75,6 +83,8 @@
       (keyword? fedn) fedn
       (map? fedn) (ffirst fedn))))
 
+;; Look into this:
+;; https://github.com/swannodette/om-next-demo/commit/92daf597e5a54393ef20d2e8c7a60c2b0a7bc804
 (defn get-ajax-next
   [path]
   (fn [edn cb]

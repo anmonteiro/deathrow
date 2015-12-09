@@ -1,17 +1,8 @@
-(ns deathrow.common
+(ns deathrow.components.common
   (:require [deathrow.history :as h]
             [deathrow.utils :as utils]
             [om.core :as om]
             [om.dom :as dom]))
-
-(def app-element (.getElementById js/document "content"))
-
-(def app-state (atom {:path nil
-                      :nav-pos nil
-                      :data nil
-                      :on-success nil
-                      :loading false
-                      :error false}))
 
 (defn panel-body-partial
   [content state owner]
@@ -47,39 +38,20 @@
       (dom/div #js{:id "circularG_7" :className "circularG"})
       (dom/div #js{:id "circularG_8" :className "circularG"}))))
 
-(defn on-success*
-  [state owner data]
-  (om/transact! state #(assoc % :error false :loading false))
-  (when-let [on-success (:on-success state)]
-    (on-success state owner data)))
-
-(defn on-error*
-  [state owner err]
-  (om/transact! state
-                    #(assoc % :error true :loading false))
-  (when-let [on-err (:on-error state)]
-    (on-err state owner err)))
 
 (defn generic-panel
-  ([app owner] (generic-panel app owner nil))
-  ([app owner opts]
+  ([state owner] (generic-panel state owner nil))
+  ([state owner opts]
    (reify
-     om/IWillMount
-     (will-mount [_]
-      (utils/highlight-nav (:nav-pos app))
-      (om/update! app :loading true)
-      (utils/get-ajax (:path app)
-                      {:success #(on-success* app owner %)
-                       :error #(on-error* app owner %)}))
      om/IRender
      (render [_]
-      (let [{:keys [loading error]} app]
-        (dom/div #js{:className "panel panel-default"}
-          (when-let [panel-heading (:heading opts)]
-            (om/build panel-heading app))
-          (cond
-            loading (om/build spinner {})
-            error (om/build error-msg {})
-            :else (om/build (:view opts) app))
-          (when-let [panel-footer (:footer opts)]
-            (om/build panel-footer app))))))))
+      (dom/div #js{:className "panel panel-default"}
+               (when-let [panel-heading (:heading opts)]
+                 (om/build panel-heading state))
+               (condp = (:data state)
+                 :loading (om/build spinner {})
+                 :error (om/build error-msg {})
+                 ;; else
+                 (om/build (:view opts) state))
+               (when-let [panel-footer (:footer opts)]
+                 (om/build panel-footer state)))))))

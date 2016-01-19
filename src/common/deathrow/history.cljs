@@ -1,81 +1,102 @@
 (ns deathrow.history
   (:require [clojure.string :as string]
-            [deathrow.constants :as C]
+            [goog.dom :as gdom]
             [goog.events :as events]
-            [goog.History :as History]
-            [goog.history.Html5History :as Html5History]
+            [goog.history.Html5History :as html5-history]
             [secretary.core :as secretary]))
 
-(defonce ^{:private true
-           :dynamic true} *history* nil)
+(defn route-fragment
+  "Returns the route fragment if this is a route that we've don't dispatch
+  on fragments for."
+  [path]
+  (-> path
+      secretary/locate-route
+      :params
+      :_fragment))
 
-(defonce ^{:private true
-           :dynamic true} *event-keys* [])
 
-(defn navigate-callback [hist callback-fn]
-  (let [key (events/listen hist goog.history.EventType.NAVIGATE callback-fn)]
-    (set! *event-keys* (conj *event-keys* key))))
+(defn path-matches?
+  "True if the two tokens are the same except for the fragment"
+  [token-a token-b]
+  (= (first (string/split token-a #"#"))
+     (first (string/split token-b #"#"))))
 
-(defn get-token
-  ([] (get-token *history*))
-  ([history] (.getToken history)))
 
-(defn set-token!
-  ([token] (set-token! *history* token))
-  ([history token] (.setToken history token)))
+(defn new-window-click? [event]
+  "It's a new window click either when the mouse middle button
+  is clicked, or when the left mouse button is clicked while
+  pressing the modifier key (Ctrl in most systems)"
+  (or (.isButton event goog.events.BrowserEvent.MouseButton.MIDDLE)
+      (and (.-platformModifierKey event)
+           (.isButton event goog.events.BrowserEvent.MouseButton.LEFT))))
 
-(defn replace-token!
-  ([token] (replace-token! *history* token))
-  ([history token]
-    (.replaceToken history token)))
 
-(defn disable-erroneous-popstate! [history]
-  (when (.-useFragment_ history)
-      (events/unlisten (.-window_ history)
-                       goog.events.EventType.POPSTATE
-                       (.-onHistoryEvent_ history)
-                       false
-                       history)))
+(defn setup-link-dispatcher! [history-imp top-level-node]
+  (let [dom-helper (gdom/DomHelper.)]
+    (events/listen top-level-node "click"
+                   #(let [-target (.-target %)
+                          target (if (= (.-tagName -target) "A")
+                                   -target
+                                   (.getAncestorByTagNameAndClass dom-helper -target "A"))
+                          location (when target (str (.-pathname target) (.-search target) (.-hash target)))
+                          new-token (when (seq location) (subs location 1))]
+                      (when (and (seq location)
+                                 (= (.. js/window -location -hostname)
+                                    (.-hostname target))
+                                 (not (or (new-window-click? %) (= (.-target target) "_blank"))))
+                        (.preventDefault %)
+                        (if (and (route-fragment location)
+                                 (path-matches? (.getToken history-imp) new-token))
 
-(defn- handle-click [e]
-  (let [target (.. e -target)
-        tag-name (.-tagName target)
-        token (str (.-pathname target) (.-search target) (.-hash target))
-        target-host (.. target -hostname)
-        curr-host (.. js/window -location -hostname)]
-    (when (and (= tag-name "A") (= curr-host target-host))
-      (.preventDefault e)
-      (set-token! *history* token))))
+                          (do ;(.log js/console "scrolling to hash for" location)
+                              ;; don't break the back button
+                              (.replaceToken history-imp new-token))
 
-(defn setup-link-dispatcher! [history]
-  (let [key (events/listen js/document "click" handle-click)]
-    (set! *event-keys* (conj *event-keys* key))))
+                          (do ;(.log js/console "navigating to" location new-token)
+                              (.setToken history-imp new-token))))))))
 
-(defn on-navigate-event [e]
-  (.log js/console "NAV: " (.-token e))
-  (secretary/dispatch! (.-token e)))
 
-(defn- teardown-events! []
-  (doseq [k *event-keys*]
-    (events/unlistenByKey k))
-  (set! *event-keys* []))
+(defn set-current-token!
+  "Lets us keep track of the history state, so that we don't dispatch twice on the same URL"
+  [history-imp & [token]]
+  (set! (.-_current_token history-imp) (or token (.getToken history-imp))))
 
-(defn- dispose! []
-  (when-let [hist *history*]
-    (teardown-events!)
-    (.dispose hist)
-    (set! *history* nil)))
+(defn disable-erroneous-popstate!
+  "Stops the browser's popstate from triggering NAVIGATION events unless the url has really
+   changed."
+  [history-imp]
+  (let [window (.-window_ history-imp)]
+    (events/removeAll window goog.events.EventType.POPSTATE)
+    (events/listen window goog.events.EventType.POPSTATE
+                   #(if (= (.getToken history-imp)
+                           (.-_current_token history-imp))
+                      (js/console.log "Ignoring duplicate dispatch event to" (.getToken history-imp))
+                      (.onHistoryEvent_ history-imp %)))))
 
-(defn init-history []
-  (let [hist (if (Html5History/isSupported)
-               (goog.history.Html5History. js/window)
-               (goog.History.))]
-    (set! *history* hist)
-    (.log js/console "TOKEN: " (get-token hist))
-    (doto hist
-      (.setUseFragment true)
-      (.setPathPrefix "/")
-      (navigate-callback on-navigate-event)
-      (disable-erroneous-popstate!)
-      (.setEnabled true)
-      (setup-link-dispatcher!))))
+
+(defn setup-dispatcher!
+  "We might want to ignore the first event dispatched by the Html5History lib,
+  because it will make a route dispatch"
+  ([history-imp] (setup-dispatcher! history-imp false))
+  ([history-imp ignore-first?]
+    (if ignore-first?
+      (events/listenOnce history-imp goog.history.EventType.NAVIGATE #(setup-dispatcher! history-imp))
+      (events/listen history-imp goog.history.EventType.NAVIGATE
+                     #(do (set-current-token! history-imp)
+                          (secretary/dispatch! (str "/" (.-token %))))))))
+
+
+(defn new-history-imp [top-level-node]
+  ;; need a history element, or goog will overwrite the entire dom
+  ;; not sure if it's needed
+  (comment (let [dom-helper (gdom/DomHelper.)
+        node (.createDom dom-helper "input" #js {:class "history hide"})]
+    (.append dom-helper node)))
+  (doto (goog.history.Html5History. js/window)
+    (.setUseFragment false)
+    (.setPathPrefix "/")
+    (setup-dispatcher!)
+    (set-current-token!) ; Stop Safari from double-dispatching
+    (disable-erroneous-popstate!) ; Stop Safari from double-dispatching
+    (.setEnabled true) ; This will fire a navigate event with the current token
+    (setup-link-dispatcher! top-level-node)))

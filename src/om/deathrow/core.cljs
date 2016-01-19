@@ -9,7 +9,7 @@
             [deathrow.utils :as utils]
             [om.core :as om])
   (:require-macros [cljs.core.async.macros :as am :refer [go alt!]]))
-
+(enable-console-print!)
 (defonce navigation-ch (chan))
 (defonce api-ch (chan))
 
@@ -18,7 +18,8 @@
 (defn install-om [state container comms]
   (om/root app/app
            state
-           {:target container}))
+           {:target container
+            :shared {:comms comms}}))
 
 (defn find-app-container []
   (.getElementById js/document "app"))
@@ -73,29 +74,13 @@
             ;; of a server to store it
             (async/timeout 10000) (do #_(print "TODO: print out history: ")))))
     ;; hack to redirect to :random-offender
-    (history/replace-token! "/offenders/random")))
-
+    (async/put! navigation-ch [:navigate! {:path "offenders/random"}])))
 
 (defn ^:export setup! []
   (let [state (app-state)
         top-level-node (find-top-level-node)
-        history-imp (history/init-history) ;(history/new-history-imp top-level-node)
-        ]
+        history-imp (history/new-history-imp top-level-node)]
     (set! debug-state state)
     (main state top-level-node history-imp)))
-
-;; OLD
-;; =======================================================
-
-(defn- teardown! []
-  ; (close! navigation-ch)
-  (history/dispose!))
-
-;; TODO: links not quite working upon reload
-(defn fig-reload-hook []
-  ;;(teardown!)
-  ;;(setup!)
-  (reinstall-om)
-  )
 
 (setup!)

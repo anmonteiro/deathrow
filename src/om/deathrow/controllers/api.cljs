@@ -36,7 +36,8 @@
 
 (defmethod post-api-event! [:default :success]
   [target message status args previous-state current-state]
-  (js/console.log "No post-api for: " (clj->js [message status])))
+  ;#_(js/console.log "No post-api for: " (clj->js [message status]))
+  )
 
 (defmethod api-event [:default :error]
   [target message status args state]
@@ -46,7 +47,7 @@
 (defmethod post-api-event! [:default :error]
   [target message status args previous-state current-state]
   #_(put! (get-in current-state [:comms :errors]) [:api-error args])
-  (js/console.log "No post-api for: " (clj->js [message status])))
+  #_(js/console.log "No post-api for: " (clj->js [message status])))
 
 (defmethod api-event [:random-offender :success]
   [target message status args state]
@@ -56,7 +57,7 @@
   [target message status args state]
   (assoc state :data status))
 
-#_(defmethod post-api-event! [:random-offender :success]
+(defmethod post-api-event! [:random-offender :success]
   [target message status args previous-state current-state]
   current-state)
 

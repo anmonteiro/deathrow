@@ -7,7 +7,7 @@
 
 (defn dominant-component [app-state owner]
   ;; map navigation point in app state to components
-  (js/console.log "navigation point: " (str (:navigation-point app-state)))
+  ;(js/console.log "navigation point: " (str (:navigation-point app-state)))
   (case (:navigation-point app-state)
     ;; for now, :landing redirects to :random-offender
     :landing #(om/component (dom/div nil))
@@ -37,7 +37,7 @@
                 (dom/li (maybe-active (:navigation-point state) :random-offender)
                   (dom/a #js {:href "/offenders/random"} "Random Statement"))
                 (dom/li (maybe-active (:navigation-point state) :offenders)
-                  (dom/a #js {:href"/offenders"} "Executed Offenders")))))
+                  (dom/a #js {:href "/offenders"} "Executed Offenders")))))
           (dom/div #js {:className "row"}
             (om/build dom-com state))
           (dom/footer #js {:className "row"}

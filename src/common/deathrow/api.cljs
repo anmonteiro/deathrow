@@ -7,6 +7,10 @@
     :random-offender (str base-url "/random")
     :offender (str base-url (:path args))))
 
+(defn offender-token [k & args]
+  (-> (apply offender-url k args)
+      (subs 1)))
+
 (defn offenders-url [& [path]]
   (let [base-url "/offenders"]
    (if path

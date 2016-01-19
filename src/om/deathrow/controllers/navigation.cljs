@@ -24,7 +24,6 @@
 
 (defmethod navigated-to :default
   [history-imp navigation-point args state]
-  (.log js/console "navigation :default")
   (navigated-default navigation-point args state))
 
 (defn post-default [navigation-point args]
@@ -54,7 +53,6 @@
 
 (defmethod navigated-to :landing
   [history-imp navigation-point args state]
-  (.log js/console ":landing")
   (-> state
       (assoc :navigation-point navigation-point
              :navigation-data args)))
@@ -62,12 +60,10 @@
 (defmethod post-navigated-to! :landing
   [history-imp navigation-point args previous-state current-state]
   (put! (get-in current-state [:comms :nav])
-        [:navigate! {:path (api/offender-url :random-offender) :replace-token? false}]))
+        [:navigate! {:path (api/offender-token :random-offender)}]))
 
 (defmethod navigated-to :random-offender
   [history-imp navigation-point args state]
-  (let [])
-  (.log js/console ":random-offender")
   (-> state
       (assoc :navigation-point navigation-point
              :navigation-data args
@@ -91,8 +87,6 @@
 
 (defmethod navigated-to :offender
   [history-imp navigation-point args state]
-  (let [])
-  (.log js/console ":random-offender")
   (-> state
       (assoc :navigation-point navigation-point
              :navigation-data args

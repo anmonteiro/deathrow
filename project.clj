@@ -2,16 +2,16 @@
   :description "Random last statements by executed offenders"
   :url "http://anmonteiro.com/deathrow"
 
-  :dependencies [[org.clojure/clojure "1.8.0-RC3"]
-                 [org.clojure/clojurescript "1.7.189"
-                  :exclusion [org.clojure/data.json] :scope "provided"]
-                 [org.clojure/core.async "0.2.374" :scope "provided"]
-                 [org.omcljs/om "1.0.0-alpha25"]
-                 [com.cognitect/transit-cljs "0.8.232"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.7.228"
+                  :exclusion [org.clojure/data.json]]
+                 [org.clojure/core.async "0.2.374"]
+                 [org.omcljs/om "1.0.0-alpha29-SNAPSHOT"]
+                 [com.cognitect/transit-cljs "0.8.237"]
                  [secretary "1.2.3"]]
 
-  :plugins [[lein-cljsbuild "1.1.1"]
-            [lein-figwheel "0.5.0-2"]]
+  :plugins [[lein-cljsbuild "1.1.2"]
+            [lein-figwheel "0.5.0-3"]]
   :clean-targets ^{:protect false} [[:cljsbuild :builds 0 :compiler :output-dir]
                                     [:cljsbuild :builds 0 :compiler :output-to]
                                     [:cljsbuild :builds 1 :compiler :output-to]
